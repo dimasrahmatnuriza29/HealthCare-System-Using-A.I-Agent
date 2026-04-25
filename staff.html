@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lokasi Obat — Staff Panel | RakObat</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .chip-active { background-color: #4f46e5; color: white; border-color: #4f46e5; }
+    .row-out { opacity: 0.45; }
+    .scroll-fade::-webkit-scrollbar { height: 6px; }
+    .scroll-fade::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+    @keyframes pulse-soft { 0%, 100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.35); } 50% { box-shadow: 0 0 0 8px rgba(79, 70, 229, 0); } }
+    .pulse-soft { animation: pulse-soft 2s infinite; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen pb-16">
+
+  <!-- Header -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
+      <a href="index.html" class="w-10 h-10 rounded-xl border border-gray-200 hover:bg-gray-50 flex items-center justify-center text-gray-600 transition" aria-label="Kembali">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+      </a>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2 flex-wrap">
+          <h1 class="text-base md:text-lg font-bold text-gray-900 truncate">Lokasi Obat — Staff Panel</h1>
+          <span class="text-[10px] md:text-xs px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 font-semibold whitespace-nowrap">Mode Staff</span>
+        </div>
+        <p class="text-xs text-gray-500 mt-0.5 truncate">Cari stok dan lokasi penyimpanan obat secara cepat</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-5 space-y-5">
+
+    <!-- Branch Selector -->
+    <section class="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm">
+      <label for="branch" class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Pilih Cabang</label>
+      <div class="mt-2 relative">
+        <div class="absolute left-3 top-1/2 -translate-y-1/2 text-indigo-600 pointer-events-none">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H5m14 0h2m-2 0v-5a2 2 0 00-2-2h-3m-9 7H3m4 0v-5a2 2 0 012-2h3m0 7v-7m4 0v7" />
+          </svg>
+        </div>
+        <select id="branch" class="w-full pl-11 pr-10 py-3 rounded-xl border border-gray-300 bg-gray-50 text-gray-900 font-medium appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+          <option value="JKT001">Apotek Sehat Jaya — JKT001</option>
+          <option value="JKT002">Apotek Farma Sentosa — JKT002</option>
+          <option value="BDG001">Apotek Bandung Care — BDG001</option>
+        </select>
+        <div class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- Search -->
+    <section class="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm">
+      <div class="relative">
+        <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M10 18a8 8 0 100-16 8 8 0 000 16z" />
+          </svg>
+        </div>
+        <input id="searchInput" type="text" placeholder="Cari obat, kategori, atau indikasi..." class="w-full pl-12 pr-12 py-4 rounded-xl border border-gray-300 bg-gray-50 text-base md:text-lg font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
+        <button id="clearSearch" class="hidden absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-600 flex items-center justify-center transition" aria-label="Bersihkan">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <p class="text-xs text-gray-400 mt-2">💡 Ketik minimal 2 karakter. Contoh: <span class="font-semibold text-gray-600">para</span>, <span class="font-semibold text-gray-600">batuk</span>, <span class="font-semibold text-gray-600">lambung</span>.</p>
+    </section>
+
+    <!-- Category Chips -->
+    <section>
+      <div id="chips" class="flex gap-2 overflow-x-auto scroll-fade pb-2 -mx-1 px-1">
+        <!-- chips injected -->
+      </div>
+    </section>
+
+    <!-- Low Stock Alert -->
+    <section id="lowStockAlert" class="hidden bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-center gap-3">
+      <div class="w-10 h-10 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center flex-shrink-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-bold text-amber-900"><span id="lowStockCount">0</span> obat stok menipis</p>
+        <p class="text-xs text-amber-700 truncate" id="lowStockNames">—</p>
+      </div>
+    </section>
+
+    <!-- Location Visual Card -->
+    <section id="locationCard" class="hidden">
+      <div class="bg-indigo-50 border-2 border-indigo-300 rounded-2xl p-5 shadow-md pulse-soft">
+        <div class="flex items-start justify-between gap-3 mb-4">
+          <div>
+            <p class="text-sm font-bold text-indigo-700 flex items-center gap-1.5">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z" />
+              </svg>
+              AMBIL DI:
+            </p>
+            <h3 id="locDrugName" class="text-xl md:text-2xl font-extrabold text-gray-900 mt-1 leading-tight">—</h3>
+            <p id="locDrugZone" class="text-sm text-indigo-700 font-medium mt-0.5">Zona —</p>
+          </div>
+          <button onclick="closeLocationCard()" class="w-8 h-8 rounded-full bg-white/70 hover:bg-white text-indigo-700 flex items-center justify-center flex-shrink-0 transition" aria-label="Tutup">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 md:gap-3">
+          <div class="bg-white rounded-xl p-3 md:p-4 text-center border border-indigo-200">
+            <p class="text-[10px] md:text-xs font-semibold text-indigo-600 uppercase tracking-wider">Storage</p>
+            <p id="locStorage" class="text-3xl md:text-5xl font-black text-indigo-700 mt-1 leading-none">—</p>
+          </div>
+          <div class="bg-white rounded-xl p-3 md:p-4 text-center border border-indigo-200">
+            <p class="text-[10px] md:text-xs font-semibold text-indigo-600 uppercase tracking-wider">Kolom</p>
+            <p id="locKolom" class="text-3xl md:text-5xl font-black text-indigo-700 mt-1 leading-none">—</p>
+          </div>
+          <div class="bg-white rounded-xl p-3 md:p-4 text-center border border-indigo-200">
+            <p class="text-[10px] md:text-xs font-semibold text-indigo-600 uppercase tracking-wider">Rak</p>
+            <p id="locRak" class="text-3xl md:text-5xl font-black text-indigo-700 mt-1 leading-none">—</p>
+          </div>
+        </div>
+
+        <div class="mt-4 grid grid-cols-2 gap-2 md:gap-3 text-sm">
+          <div class="bg-white/70 rounded-lg p-3 border border-indigo-100">
+            <p class="text-xs text-gray-500">Stok</p>
+            <p id="locStok" class="font-bold text-gray-900">—</p>
+          </div>
+          <div class="bg-white/70 rounded-lg p-3 border border-indigo-100">
+            <p class="text-xs text-gray-500">Harga</p>
+            <p id="locHarga" class="font-bold text-gray-900">—</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results Table -->
+    <section class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+      <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+        <div>
+          <h3 class="font-bold text-gray-900">Daftar Obat</h3>
+          <p class="text-xs text-gray-500"><span id="resultCount">0</span> hasil ditemukan</p>
+        </div>
+        <span class="text-xs text-gray-400 hidden md:inline">Geser ke samping untuk melihat detail →</span>
+      </div>
+      <div class="overflow-x-auto scroll-fade">
+        <table class="w-full text-sm min-w-[820px]">
+          <thead class="bg-gray-50 text-gray-600 text-xs uppercase tracking-wide">
+            <tr>
+              <th class="text-left px-4 py-3 font-semibold">Nama Obat</th>
+              <th class="text-left px-4 py-3 font-semibold">Dosis</th>
+              <th class="text-left px-4 py-3 font-semibold">Stok</th>
+              <th class="text-center px-3 py-3 font-semibold">Storage</th>
+              <th class="text-center px-3 py-3 font-semibold">Kolom</th>
+              <th class="text-center px-3 py-3 font-semibold">Rak</th>
+              <th class="text-left px-4 py-3 font-semibold">Status</th>
+              <th class="text-left px-4 py-3 font-semibold">Harga</th>
+              <th class="text-right px-4 py-3 font-semibold">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody" class="divide-y divide-gray-100"></tbody>
+        </table>
+      </div>
+      <div id="emptyState" class="hidden p-10 text-center">
+        <div class="w-14 h-14 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center mx-auto mb-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M10 18a8 8 0 100-16 8 8 0 000 16z" />
+          </svg>
+        </div>
+        <p class="font-semibold text-gray-700">Obat tidak ditemukan</p>
+        <p class="text-sm text-gray-500 mt-1">Coba kata kunci lain atau ubah filter kategori.</p>
+      </div>
+    </section>
+
+    <!-- AI Safety Advisor Preview -->
+    <section class="bg-gradient-to-br from-violet-50 to-indigo-50 rounded-2xl border border-violet-200 p-5 shadow-sm">
+      <div class="flex items-start justify-between gap-3 mb-4 flex-wrap">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-violet-600 text-white flex items-center justify-center flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-bold text-gray-900">AI Safety Advisor</h3>
+            <p class="text-xs text-gray-500">Preview fitur masa depan</p>
+          </div>
+        </div>
+        <span class="text-xs px-2.5 py-1 rounded-full bg-violet-100 text-violet-700 font-semibold border border-violet-200">Preview</span>
+      </div>
+
+      <!-- Customer Picker -->
+      <div class="bg-white rounded-xl p-4 border border-violet-100 mb-3">
+        <label class="text-xs font-semibold text-gray-500 uppercase">Pilih Customer</label>
+        <select id="customerSelect" class="w-full mt-1.5 py-2.5 px-3 rounded-lg border border-gray-300 bg-gray-50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500">
+          <!-- injected -->
+        </select>
+        <div id="customerCard" class="mt-3 flex items-start gap-2 text-xs">
+          <!-- injected -->
+        </div>
+      </div>
+
+      <!-- Advisory output -->
+      <div id="advisoryBox" class="bg-white rounded-xl p-4 border border-violet-100">
+        <div class="flex items-center gap-2 text-sm text-gray-500">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p>Pilih obat dari tabel untuk melihat advisory keamanan.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // ============ DATA: MEDICINES (master) ============
+    // medicineId mengikuti penomoran framework Section 3 (MED001..MED010)
+    const medicines = [
+      { id: 'MED001', nama: 'Paracetamol',     dosis: '500mg',  kategori: 'Analgesik',  indikasi: 'demam, nyeri' },
+      { id: 'MED002', nama: 'Ibuprofen',       dosis: '400mg',  kategori: 'Analgesik',  indikasi: 'nyeri, anti-inflamasi' },
+      { id: 'MED003', nama: 'Amoxicillin',     dosis: '500mg',  kategori: 'Antibiotik', indikasi: 'infeksi bakteri' },
+      { id: 'MED004', nama: 'Cefadroxil',      dosis: '500mg',  kategori: 'Antibiotik', indikasi: 'infeksi bakteri' },
+      { id: 'MED005', nama: 'Vitamin C',       dosis: '500mg',  kategori: 'Vitamin',    indikasi: 'daya tahan tubuh' },
+      { id: 'MED006', nama: 'OBH Combi Sirup', dosis: '100ml',  kategori: 'Batuk',      indikasi: 'batuk, flu' },
+      { id: 'MED007', nama: 'Bisolvon Tablet', dosis: '8mg',    kategori: 'Batuk',      indikasi: 'batuk berdahak' },
+      { id: 'MED008', nama: 'Antasida DOEN',   dosis: '-',      kategori: 'Lambung',    indikasi: 'maag, asam lambung' },
+      { id: 'MED009', nama: 'Omeprazole',      dosis: '20mg',   kategori: 'Lambung',    indikasi: 'maag, GERD, asam lambung' },
+      // Loratadine: zona "Analgesik/Antihistamin" (Section 3) — kategori untuk filter
+      // chip diset 'Analgesik' agar sesuai daftar chip framework
+      // (Semua, Analgesik, Antibiotik, Lambung, Batuk, Vitamin)
+      { id: 'MED010', nama: 'Loratadine',      dosis: '10mg',   kategori: 'Analgesik',  indikasi: 'alergi, gatal, pilek alergi, antihistamin' },
+    ];
+
+    // ============ DATA: STORAGE LOCATIONS (per cabang) ============
+    // Framework Section 3: untuk versi awal semua cabang menggunakan mapping default.
+    // Default mapping disimpan dan di-spread ke setiap branchId.
+    const defaultLocations = {
+      MED001: { storage: 'A', kolom: 1, rak: 2, zone: 'Analgesik & Antipiretik' },
+      MED002: { storage: 'A', kolom: 1, rak: 3, zone: 'Analgesik & Antipiretik' },
+      MED003: { storage: 'B', kolom: 1, rak: 1, zone: 'Antibiotik' },
+      MED004: { storage: 'B', kolom: 1, rak: 2, zone: 'Antibiotik' },
+      MED005: { storage: 'E', kolom: 1, rak: 1, zone: 'Vitamin & Suplemen' },
+      MED006: { storage: 'D', kolom: 1, rak: 1, zone: 'Batuk & Napas' },
+      MED007: { storage: 'D', kolom: 1, rak: 2, zone: 'Batuk & Napas' },
+      MED008: { storage: 'C', kolom: 1, rak: 1, zone: 'Gastrointestinal' },
+      MED009: { storage: 'C', kolom: 1, rak: 2, zone: 'Gastrointestinal' },
+      MED010: { storage: 'A', kolom: 2, rak: 1, zone: 'Analgesik / Antihistamin' },
+    };
+    const storageLocations = {
+      JKT001: { ...defaultLocations },
+      JKT002: { ...defaultLocations },
+      BDG001: { ...defaultLocations },
+    };
+
+    // ============ DATA: STOK & HARGA per cabang ============
+    const branchStock = {
+      JKT001: { MED001: 50, MED002: 15, MED003: 0,  MED004: 25, MED005: 70, MED006: 12, MED007: 30, MED008: 45, MED009: 18, MED010: 40 },
+      JKT002: { MED001: 28, MED002: 0,  MED003: 35, MED004: 8,  MED005: 22, MED006: 40, MED007: 5,  MED008: 60, MED009: 24, MED010: 16 },
+      BDG001: { MED001: 11, MED002: 22, MED003: 14, MED004: 0,  MED005: 100,MED006: 19, MED007: 27, MED008: 9,  MED009: 33, MED010: 6  },
+    };
+    const branchPrices = {
+      JKT001: { MED001: 8500,  MED002: 12000, MED003: 18000, MED004: 20000, MED005: 10000, MED006: 17500, MED007: 15000, MED008: 7500, MED009: 22000, MED010: 11000 },
+      JKT002: { MED001: 8800,  MED002: 12500, MED003: 18500, MED004: 20500, MED005: 10500, MED006: 18000, MED007: 15500, MED008: 7800, MED009: 22500, MED010: 11500 },
+      BDG001: { MED001: 8200,  MED002: 11500, MED003: 17500, MED004: 19500, MED005: 9500,  MED006: 17000, MED007: 14500, MED008: 7200, MED009: 21500, MED010: 10500 },
+    };
+
+    // ============ DATA: CUSTOMERS (preview) ============
+    const customers = {
+      budi: {
+        nama: 'Budi Santoso',
+        usia: 7,
+        kategoriUsia: 'ANAK',
+        initial: 'BS',
+        alergi: ['Aspirin', 'Penisilin'],
+        kondisi: [],
+        catatan: 'Ibu bilang Budi susah minum tablet, preferensi sirup.',
+        riwayat: ['Amoxicillin 500mg (15 Mar)', 'Paracetamol Sirup (12 Mar)']
+      },
+      rina: {
+        nama: 'Rina Wijaya',
+        usia: 32,
+        kategoriUsia: 'DEWASA',
+        initial: 'RW',
+        alergi: [],
+        kondisi: ['Hamil Trimester 3'],
+        catatan: 'Keluhan nyeri pinggang, hindari NSAID karena trimester 3.',
+        riwayat: ['Vitamin B6 (10 Apr)']
+      }
+    };
+
+    // ============ STATE ============
+    const categories = ['Semua', 'Analgesik', 'Antibiotik', 'Lambung', 'Batuk', 'Vitamin'];
+    let activeBranch = 'JKT001';
+    let activeCategory = 'Semua';
+    let activeQuery = '';
+    let activeCustomerKey = 'budi';
+    let lastSelectedDrug = null;
+
+    // ============ HELPERS ============
+    const fmtRp = (n) => 'Rp ' + n.toLocaleString('id-ID');
+    const statusOf = (s) => {
+      if (s === 0) return { label: 'Habis', cls: 'bg-rose-100 text-rose-700 border-rose-200' };
+      if (s < 20) return { label: 'Stok Menipis', cls: 'bg-amber-100 text-amber-800 border-amber-200' };
+      return { label: 'Tersedia', cls: 'bg-emerald-100 text-emerald-700 border-emerald-200' };
+    };
+
+    // Section 6 — Data Flow: gabungkan medicines + branchStock + branchPrices + storageLocations
+    function buildDrugsForBranch(branchId) {
+      const stockMap = branchStock[branchId] || {};
+      const priceMap = branchPrices[branchId] || {};
+      const locMap   = storageLocations[branchId] || {};
+      return medicines.map(m => {
+        const loc = locMap[m.id] || {};
+        return {
+          id: m.id,
+          nama: m.nama,
+          dosis: m.dosis,
+          kategori: m.kategori,
+          indikasi: m.indikasi,
+          stok: stockMap[m.id] ?? 0,
+          harga: priceMap[m.id] ?? 0,
+          storage: loc.storage ?? '-',
+          kolom: loc.kolom ?? '-',
+          rak: loc.rak ?? '-',
+          zona: loc.zone ?? '-'
+        };
+      });
+    }
+
+    // ============ RENDER CHIPS ============
+    const chipsEl = document.getElementById('chips');
+    function renderChips() {
+      chipsEl.innerHTML = categories.map(c => {
+        const active = c === activeCategory;
+        return `<button data-cat="${c}" class="chip whitespace-nowrap text-sm font-semibold px-4 py-2 rounded-full border transition ${active ? 'chip-active' : 'bg-white text-gray-700 border-gray-300 hover:border-indigo-400 hover:text-indigo-600'}">${c}</button>`;
+      }).join('');
+      chipsEl.querySelectorAll('.chip').forEach(b => {
+        b.addEventListener('click', () => {
+          activeCategory = b.dataset.cat;
+          renderChips();
+          renderTable();
+        });
+      });
+    }
+
+    // ============ FILTER + RENDER TABLE ============
+    function getFiltered() {
+      let list = buildDrugsForBranch(activeBranch);
+      if (activeCategory !== 'Semua') list = list.filter(d => d.kategori === activeCategory);
+      if (activeQuery.length >= 2) {
+        const q = activeQuery.toLowerCase();
+        list = list.filter(d =>
+          d.nama.toLowerCase().includes(q) ||
+          d.kategori.toLowerCase().includes(q) ||
+          d.indikasi.toLowerCase().includes(q)
+        );
+      }
+      return list;
+    }
+
+    const tbody = document.getElementById('tableBody');
+    const emptyState = document.getElementById('emptyState');
+    const resultCount = document.getElementById('resultCount');
+
+    function renderTable() {
+      const list = getFiltered();
+      resultCount.textContent = list.length;
+
+      if (list.length === 0) {
+        tbody.innerHTML = '';
+        emptyState.classList.remove('hidden');
+      } else {
+        emptyState.classList.add('hidden');
+        tbody.innerHTML = list.map(d => {
+          const st = statusOf(d.stok);
+          const rowCls = d.stok === 0 ? 'row-out' : '';
+          return `
+            <tr class="${rowCls} hover:bg-indigo-50/40 transition">
+              <td class="px-4 py-3">
+                <div class="font-semibold text-gray-900">${d.nama}</div>
+                <div class="text-xs text-gray-500">${d.kategori} · ${d.indikasi}</div>
+              </td>
+              <td class="px-4 py-3 text-gray-700">${d.dosis}</td>
+              <td class="px-4 py-3 font-semibold text-gray-900">${d.stok}</td>
+              <td class="px-3 py-3 text-center"><span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 font-bold">${d.storage}</span></td>
+              <td class="px-3 py-3 text-center font-semibold text-gray-700">${d.kolom}</td>
+              <td class="px-3 py-3 text-center font-semibold text-gray-700">${d.rak}</td>
+              <td class="px-4 py-3"><span class="text-xs font-semibold px-2.5 py-1 rounded-full border ${st.cls}">${st.label}</span></td>
+              <td class="px-4 py-3 font-semibold text-gray-900 whitespace-nowrap">${fmtRp(d.harga)}</td>
+              <td class="px-4 py-3 text-right">
+                <button data-id="${d.id}" class="btn-loc inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition whitespace-nowrap">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/></svg>
+                  Lihat Lokasi
+                </button>
+              </td>
+            </tr>`;
+        }).join('');
+
+        tbody.querySelectorAll('.btn-loc').forEach(b => {
+          b.addEventListener('click', () => {
+            const id = b.dataset.id;
+            const drug = list.find(x => x.id === id);
+            lastSelectedDrug = drug;
+            showLocation(drug);
+            showAdvisory(drug);
+          });
+        });
+      }
+    }
+
+    // ============ LOW STOCK ALERT ============
+    function renderLowStock() {
+      const list = buildDrugsForBranch(activeBranch);
+      const low = list.filter(d => d.stok > 0 && d.stok < 20);
+      const el = document.getElementById('lowStockAlert');
+      if (low.length === 0) { el.classList.add('hidden'); return; }
+      el.classList.remove('hidden');
+      document.getElementById('lowStockCount').textContent = low.length;
+      document.getElementById('lowStockNames').textContent = low.map(d => `${d.nama} (${d.stok})`).join(' · ');
+    }
+
+    // ============ LOCATION CARD ============
+    function showLocation(d) {
+      const card = document.getElementById('locationCard');
+      card.classList.remove('hidden');
+      document.getElementById('locDrugName').textContent = `${d.nama} ${d.dosis !== '-' ? d.dosis : ''}`.trim();
+      document.getElementById('locDrugZone').textContent = `Zona ${d.zona}`;
+      document.getElementById('locStorage').textContent = d.storage;
+      document.getElementById('locKolom').textContent = d.kolom;
+      document.getElementById('locRak').textContent = d.rak;
+      document.getElementById('locStok').textContent = d.stok === 0 ? 'Habis' : `${d.stok} pcs`;
+      document.getElementById('locHarga').textContent = fmtRp(d.harga);
+      window.scrollTo({ top: card.offsetTop - 80, behavior: 'smooth' });
+    }
+    function closeLocationCard() {
+      document.getElementById('locationCard').classList.add('hidden');
+    }
+
+    // ============ CUSTOMER PANEL ============
+    function renderCustomerSelect() {
+      const sel = document.getElementById('customerSelect');
+      sel.innerHTML = Object.entries(customers).map(([key, c]) => {
+        const tag = c.kondisi.length ? ` · ${c.kondisi[0]}` : (c.alergi.length ? ` · alergi ${c.alergi.join(', ')}` : '');
+        return `<option value="${key}">${c.nama}, ${c.usia} tahun${tag}</option>`;
+      }).join('');
+      sel.value = activeCustomerKey;
+    }
+    function renderCustomerCard() {
+      const c = customers[activeCustomerKey];
+      const allergyLine = c.alergi.length
+        ? `Alergi: <span class="text-rose-700 font-medium">${c.alergi.join(', ')}</span>`
+        : `Alergi: <span class="text-emerald-700 font-medium">tidak ada</span>`;
+      const condLine = c.kondisi.length
+        ? `<span class="text-amber-700 font-medium"> · Kondisi: ${c.kondisi.join(', ')}</span>`
+        : '';
+      document.getElementById('customerCard').innerHTML = `
+        <div class="w-8 h-8 rounded-full bg-violet-100 text-violet-700 flex items-center justify-center flex-shrink-0 font-bold">${c.initial}</div>
+        <div>
+          <p class="font-semibold text-gray-900">${c.nama}</p>
+          <p class="text-gray-500">Usia ${c.usia} tahun (${c.kategoriUsia}) · ${allergyLine}${condLine}</p>
+        </div>`;
+    }
+
+    // ============ ADVISORY (peka customer + obat) ============
+    // Sederhana: cek alergi langsung, cross-react Penisilin↔Sefalosporin,
+    // kontraindikasi NSAID untuk hamil trimester 3.
+    function evaluateAdvisory(customer, d) {
+      const alergi = customer.alergi || [];
+      const hamilT3 = (customer.kondisi || []).some(k => /Hamil Trimester 3/i.test(k));
+
+      // Default: aman
+      let status = 'Aman', color = 'emerald', icon = '✓';
+      let alergiMsg = 'Tidak ada konflik dengan alergi pasien.';
+      let interaksiMsg = 'Tidak ada interaksi mayor terdeteksi.';
+      let kontraMsg = 'Tidak ada kontraindikasi untuk profil pasien ini.';
+      let saran = 'Pastikan pasien meminum sesuai instruksi label.';
+
+      // Cek alergi langsung
+      if (alergi.includes('Penisilin') && d.id === 'MED003') {
+        status = 'Bahaya'; color = 'rose'; icon = '×';
+        alergiMsg = 'KONFLIK: Amoxicillin = derivat Penisilin.';
+        saran = 'JANGAN diberikan. Sarankan antibiotik non-penisilin atau rujuk dokter.';
+      } else if (alergi.includes('Penisilin') && d.id === 'MED004') {
+        status = 'Peringatan'; color = 'amber'; icon = '!';
+        alergiMsg = 'Cefadroxil (sefalosporin) — risiko reaksi silang ~5–10% dengan alergi Penisilin.';
+        saran = 'Konsultasikan dokter sebelum diberikan, atau pilih golongan lain.';
+      } else if (alergi.includes('NSAID') && d.id === 'MED002') {
+        status = 'Bahaya'; color = 'rose'; icon = '×';
+        alergiMsg = 'KONFLIK: Ibuprofen termasuk NSAID.';
+        saran = 'JANGAN diberikan. Pertimbangkan Paracetamol sebagai alternatif.';
+      }
+
+      // Kontraindikasi: NSAID pada hamil trimester 3
+      if (hamilT3 && d.id === 'MED002') {
+        status = 'Bahaya'; color = 'rose'; icon = '×';
+        kontraMsg = 'Ibuprofen TIDAK BOLEH untuk ibu hamil trimester 3 — risiko penutupan duktus arteriosus janin & komplikasi persalinan.';
+        saran = 'JANGAN diberikan. Alternatif aman: Paracetamol 500mg (Storage A, Kolom 1, Rak 2).';
+      }
+
+      // Dosis sesuai kategori usia
+      let dosis;
+      if (customer.kategoriUsia === 'ANAK') {
+        const dosisAnak = {
+          MED001: 'Anak 7 thn (~22 kg): 220–330 mg setiap 4–6 jam, maks 4× sehari.',
+          MED002: 'Anak 7 thn: 5–10 mg/kg setiap 6–8 jam, maks 30 mg/kg/hari.',
+          MED003: '25–50 mg/kg/hari dibagi 3 dosis (jika tidak alergi).',
+          MED004: '30 mg/kg/hari dibagi 2 dosis.',
+          MED005: '100–250 mg/hari sesudah makan.',
+          MED006: '½–1 sendok takar (5–10 ml), 3× sehari.',
+          MED007: '1× ½ tablet, 3× sehari.',
+          MED008: '½ tablet kunyah, 3× sehari sebelum makan.',
+          MED009: 'Tidak rutin dipakai untuk anak — konsultasi dokter.',
+          MED010: '5 mg (½ tablet) 1× sehari untuk usia ≥6 tahun.'
+        };
+        dosis = dosisAnak[d.id] || 'Sesuaikan dengan berat badan & usia. Konsultasi apoteker.';
+      } else {
+        const dosisDewasa = {
+          MED001: '500–1000 mg setiap 4–6 jam, maks 4 g/hari.',
+          MED002: '200–400 mg setiap 4–6 jam, maks 1200 mg/hari (OTC).',
+          MED003: '500 mg setiap 8 jam selama 5–7 hari.',
+          MED004: '500 mg setiap 12 jam atau 1 g sehari sekali.',
+          MED005: '500–1000 mg/hari sesudah makan.',
+          MED006: '1 sendok takar (15 ml), 3× sehari.',
+          MED007: '1 tablet 8 mg, 3× sehari.',
+          MED008: '1–2 tablet kunyah, 3–4× sehari sebelum makan.',
+          MED009: '20 mg sehari sekali sebelum sarapan, 4–8 minggu.',
+          MED010: '10 mg (1 tablet) 1× sehari.'
+        };
+        dosis = dosisDewasa[d.id] || 'Sesuaikan dengan kebutuhan. Konsultasi apoteker.';
+      }
+      if (status === 'Bahaya') dosis = '— (tidak direkomendasikan)';
+
+      // Insight catatan
+      let catatan = customer.catatan || '';
+      if (customer.kategoriUsia === 'ANAK' && /sirup|tablet/i.test(catatan) && d.id === 'MED001') {
+        saran = 'Pertimbangkan Paracetamol Sirup karena pasien preferensi sirup. ' + saran;
+      }
+
+      return {
+        status, color, icon,
+        ringkasan: status === 'Bahaya'
+          ? `${d.nama} ${d.dosis} TIDAK aman untuk ${customer.nama}.`
+          : status === 'Peringatan'
+            ? `${d.nama} ${d.dosis} perlu kehati-hatian untuk ${customer.nama}.`
+            : `${d.nama} ${d.dosis} aman diberikan ke ${customer.nama}.`,
+        dosis, alergi: alergiMsg, interaksi: interaksiMsg, kontra: kontraMsg, saran,
+        catatan
+      };
+    }
+
+    function showAdvisory(d) {
+      const customer = customers[activeCustomerKey];
+      const a = evaluateAdvisory(customer, d);
+      const colorMap = {
+        emerald: { bg: 'bg-emerald-50', border: 'border-emerald-200', badge: 'bg-emerald-100 text-emerald-800 border-emerald-200' },
+        amber:   { bg: 'bg-amber-50',   border: 'border-amber-200',   badge: 'bg-amber-100 text-amber-800 border-amber-200' },
+        rose:    { bg: 'bg-rose-50',    border: 'border-rose-200',    badge: 'bg-rose-100 text-rose-800 border-rose-200' },
+      };
+      const c = colorMap[a.color];
+      const dosisLabel = d.dosis !== '-' ? d.dosis : '';
+      document.getElementById('advisoryBox').innerHTML = `
+        <div class="${c.bg} ${c.border} border rounded-xl p-4">
+          <div class="flex items-center gap-2 flex-wrap mb-2">
+            <span class="text-xs px-2.5 py-1 rounded-full border font-bold ${c.badge}">${a.icon} Status: ${a.status}</span>
+            <span class="text-sm font-semibold text-gray-900">${d.nama} ${dosisLabel}</span>
+            <span class="text-xs text-gray-500">untuk ${customer.nama} (${customer.usia} thn)</span>
+          </div>
+          <p class="text-sm text-gray-700">${a.ringkasan}</p>
+        </div>
+        <div class="grid sm:grid-cols-2 gap-3 mt-3 text-sm">
+          <div class="p-3 rounded-lg bg-gray-50 border border-gray-100">
+            <p class="text-[11px] font-semibold text-gray-500 uppercase">Rekomendasi Dosis</p>
+            <p class="mt-1 text-gray-800">${a.dosis}</p>
+          </div>
+          <div class="p-3 rounded-lg bg-gray-50 border border-gray-100">
+            <p class="text-[11px] font-semibold text-gray-500 uppercase">Cek Alergi</p>
+            <p class="mt-1 text-gray-800">${a.alergi}</p>
+          </div>
+          <div class="p-3 rounded-lg bg-gray-50 border border-gray-100">
+            <p class="text-[11px] font-semibold text-gray-500 uppercase">Interaksi Obat</p>
+            <p class="mt-1 text-gray-800">${a.interaksi}</p>
+          </div>
+          <div class="p-3 rounded-lg bg-gray-50 border border-gray-100">
+            <p class="text-[11px] font-semibold text-gray-500 uppercase">Kontraindikasi</p>
+            <p class="mt-1 text-gray-800">${a.kontra}</p>
+          </div>
+          <div class="sm:col-span-2 p-3 rounded-lg bg-violet-50 border border-violet-100">
+            <p class="text-[11px] font-semibold text-violet-700 uppercase">Saran untuk Staff</p>
+            <p class="mt-1 text-gray-800">${a.saran}</p>
+            ${a.catatan ? `<p class="mt-1 text-xs text-gray-500">📝 Catatan sebelumnya: ${a.catatan}</p>` : ''}
+          </div>
+        </div>`;
+    }
+
+    // ============ EVENTS ============
+    const searchInput = document.getElementById('searchInput');
+    const clearBtn = document.getElementById('clearSearch');
+    searchInput.addEventListener('input', (e) => {
+      activeQuery = e.target.value.trim();
+      clearBtn.classList.toggle('hidden', activeQuery.length === 0);
+      renderTable();
+    });
+    clearBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      activeQuery = '';
+      clearBtn.classList.add('hidden');
+      renderTable();
+      searchInput.focus();
+    });
+
+    document.getElementById('branch').addEventListener('change', (e) => {
+      activeBranch = e.target.value;
+      renderTable();
+      renderLowStock();
+      // Refresh kartu lokasi & advisory jika ada obat yang sedang dipilih
+      if (lastSelectedDrug) {
+        const refreshed = buildDrugsForBranch(activeBranch).find(x => x.id === lastSelectedDrug.id);
+        if (refreshed) {
+          lastSelectedDrug = refreshed;
+          showLocation(refreshed);
+          showAdvisory(refreshed);
+        }
+      }
+    });
+
+    document.getElementById('customerSelect').addEventListener('change', (e) => {
+      activeCustomerKey = e.target.value;
+      renderCustomerCard();
+      if (lastSelectedDrug) showAdvisory(lastSelectedDrug);
+    });
+
+    // ============ INIT ============
+    renderChips();
+    renderTable();
+    renderLowStock();
+    renderCustomerSelect();
+    renderCustomerCard();
+  </script>
+</body>
+</html>
