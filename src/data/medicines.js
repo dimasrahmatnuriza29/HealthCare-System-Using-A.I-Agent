@@ -1,0 +1,98 @@
+export const medicineCategories = ['Semua', 'Analgesik', 'Antibiotik', 'Lambung', 'Batuk', 'Vitamin'];
+
+export const medicines = [
+  {
+    id: 'MED001',
+    name: 'Paracetamol 500mg',
+    dose: '500mg',
+    form: 'Tablet',
+    category: 'Analgesik',
+    indications: ['demam', 'nyeri', 'sakit kepala', 'antipiretik'],
+    tags: ['analgesik', 'antipiretik'],
+  },
+  {
+    id: 'MED002',
+    name: 'Ibuprofen 400mg',
+    dose: '400mg',
+    form: 'Tablet',
+    category: 'Analgesik',
+    indications: ['nyeri', 'anti-inflamasi', 'demam'],
+    tags: ['NSAID', 'anti-inflamasi'],
+  },
+  {
+    id: 'MED003',
+    name: 'Amoxicillin 500mg',
+    dose: '500mg',
+    form: 'Kapsul',
+    category: 'Antibiotik',
+    indications: ['infeksi bakteri', 'infeksi tenggorokan', 'antimikroba'],
+    tags: ['penisilin', 'antibiotik'],
+  },
+  {
+    id: 'MED004',
+    name: 'Cefadroxil 500mg',
+    dose: '500mg',
+    form: 'Kapsul',
+    category: 'Antibiotik',
+    indications: ['infeksi bakteri', 'infeksi kulit', 'antimikroba'],
+    tags: ['sefalosporin', 'antibiotik'],
+  },
+  {
+    id: 'MED005',
+    name: 'Vitamin C 500mg',
+    dose: '500mg',
+    form: 'Tablet',
+    category: 'Vitamin',
+    indications: ['daya tahan tubuh', 'suplemen', 'vitamin'],
+    tags: ['vitamin', 'suplemen'],
+  },
+  {
+    id: 'MED006',
+    name: 'OBH Combi Sirup 100ml',
+    dose: '100ml',
+    form: 'Sirup',
+    category: 'Batuk',
+    indications: ['batuk', 'flu', 'saluran napas'],
+    tags: ['batuk', 'napas', 'sirup'],
+  },
+  {
+    id: 'MED007',
+    name: 'Bisolvon Tablet 8mg',
+    dose: '8mg',
+    form: 'Tablet',
+    category: 'Batuk',
+    indications: ['batuk berdahak', 'mukolitik', 'saluran napas'],
+    tags: ['batuk', 'napas'],
+  },
+  {
+    id: 'MED008',
+    name: 'Antasida DOEN',
+    dose: 'Tablet kunyah',
+    form: 'Tablet kunyah',
+    category: 'Lambung',
+    indications: ['maag', 'asam lambung', 'nyeri ulu hati', 'gastrointestinal'],
+    tags: ['lambung', 'gastrointestinal'],
+  },
+  {
+    id: 'MED009',
+    name: 'Omeprazole 20mg',
+    dose: '20mg',
+    form: 'Kapsul',
+    category: 'Lambung',
+    indications: ['maag', 'GERD', 'asam lambung', 'gastrointestinal'],
+    tags: ['lambung', 'PPI'],
+  },
+  {
+    id: 'MED010',
+    name: 'Loratadine 10mg',
+    dose: '10mg',
+    form: 'Tablet',
+    category: 'Analgesik',
+    indications: ['alergi', 'gatal', 'pilek alergi', 'antihistamin'],
+    tags: ['antihistamin', 'alergi'],
+  },
+];
+
+export function getMedicineById(medicineId) {
+  return medicines.find((medicine) => medicine.id === medicineId) ?? null;
+}
