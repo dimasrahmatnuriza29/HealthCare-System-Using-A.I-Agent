@@ -15,6 +15,15 @@ body {
   background: #f8fafc;
 }
 
+@media (max-width: 639px) {
+  html,
+  body,
+  #root {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+}
+
 html {
   scroll-padding-top: 150px;
 }

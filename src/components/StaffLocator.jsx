@@ -101,9 +101,9 @@ function LocationCard({ item, onClose }) {
   if (!item) return null;
 
   return (
-    <section className="location-card-pulse rounded-lg border-2 border-indigo-300 bg-indigo-50 p-4 shadow-sm md:p-5">
+    <section className="location-card-pulse min-w-0 overflow-hidden rounded-lg border-2 border-indigo-300 bg-indigo-50 p-4 shadow-sm md:p-5">
       <div className="flex items-start justify-between gap-3">
-        <div>
+        <div className="min-w-0">
           <p className="flex items-center gap-2 text-sm font-black uppercase tracking-wide text-indigo-700">
             <LocationPinIcon />
             AMBIL DI:
@@ -121,29 +121,29 @@ function LocationCard({ item, onClose }) {
         </button>
       </div>
 
-      <div className="mt-4 grid grid-cols-3 gap-2 md:gap-3">
+      <div className="mt-4 grid min-w-0 grid-cols-3 gap-2 md:gap-3">
         {[
           ['Storage', item.storage],
           ['Kolom', item.kolom],
           ['Rak', item.rak],
         ].map(([label, value]) => (
-          <div key={label} className="rounded-lg border border-indigo-200 bg-white p-3 text-center md:p-4">
+          <div key={label} className="min-w-0 rounded-lg border border-indigo-200 bg-white p-3 text-center md:p-4">
             <p className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 md:text-xs">{label}</p>
             <p className="mt-1 text-4xl font-black leading-none text-indigo-700 md:text-5xl">{value}</p>
           </div>
         ))}
       </div>
 
-      <div className="mt-4 grid gap-2 text-sm sm:grid-cols-3">
-        <div className="rounded-lg border border-indigo-100 bg-white/80 p-3">
+      <div className="mt-4 grid min-w-0 gap-2 text-sm sm:grid-cols-3">
+        <div className="min-w-0 rounded-lg border border-indigo-100 bg-white/80 p-3">
           <p className="text-xs font-semibold text-gray-500">Stok</p>
           <p className="mt-1 font-bold text-gray-900">{item.stock === 0 ? 'Habis' : `${item.stock} pcs`}</p>
         </div>
-        <div className="rounded-lg border border-indigo-100 bg-white/80 p-3">
+        <div className="min-w-0 rounded-lg border border-indigo-100 bg-white/80 p-3">
           <p className="text-xs font-semibold text-gray-500">Harga</p>
           <p className="mt-1 font-bold text-gray-900">{formatRupiah(item.price)}</p>
         </div>
-        <div className="rounded-lg border border-indigo-100 bg-white/80 p-3">
+        <div className="min-w-0 rounded-lg border border-indigo-100 bg-white/80 p-3">
           <p className="text-xs font-semibold text-gray-500">Status</p>
           <p className="mt-1 font-bold text-gray-900">{item.status.label}</p>
         </div>
@@ -161,7 +161,7 @@ function SummaryCard({ label, value, tone = 'slate' }) {
   };
 
   return (
-    <div className={`rounded-lg border px-3 py-2.5 ${toneClass[tone]}`}>
+    <div className={`min-h-20 min-w-0 overflow-hidden rounded-lg border px-3 py-3 ${toneClass[tone]}`}>
       <p className="text-[11px] font-bold uppercase tracking-wide opacity-70">{label}</p>
       <p className="mt-1 text-2xl font-black leading-none">{value}</p>
     </div>
@@ -172,15 +172,15 @@ function MobileMedicineCards({ rows, selectedMedicineId, onSelect }) {
   if (!rows.length) return null;
 
   return (
-    <div className="grid gap-3 md:hidden">
+    <div className="grid min-w-0 gap-3 md:hidden">
       {rows.map((item) => (
         <article
           key={item.id}
-          className={`rounded-lg border bg-white p-3 shadow-sm ${
+          className={`min-w-0 overflow-hidden rounded-lg border bg-white p-3 shadow-sm ${
             selectedMedicineId === item.id ? 'border-indigo-300 ring-2 ring-indigo-100' : 'border-gray-200'
           } ${item.status.key === 'out' ? 'opacity-65' : ''}`}
         >
-          <div className="flex items-start justify-between gap-3">
+          <div className="flex min-w-0 items-start justify-between gap-3">
             <div className="min-w-0">
               <h3 className="break-words text-base font-black leading-tight text-gray-900">{item.medicine.name}</h3>
               <p className="mt-1 text-xs font-medium text-gray-500">
@@ -192,23 +192,23 @@ function MobileMedicineCards({ rows, selectedMedicineId, onSelect }) {
             </span>
           </div>
 
-          <div className="mt-3 grid grid-cols-3 gap-2">
-            <div className="rounded-lg bg-indigo-50 p-2 text-center">
+          <div className="mt-3 grid min-w-0 grid-cols-3 gap-2">
+            <div className="min-w-0 rounded-lg bg-indigo-50 p-2 text-center">
               <p className="text-[10px] font-black uppercase text-indigo-600">Storage</p>
               <p className="mt-1 text-2xl font-black leading-none text-indigo-700">{item.storage}</p>
             </div>
-            <div className="rounded-lg bg-indigo-50 p-2 text-center">
+            <div className="min-w-0 rounded-lg bg-indigo-50 p-2 text-center">
               <p className="text-[10px] font-black uppercase text-indigo-600">Kolom</p>
               <p className="mt-1 text-2xl font-black leading-none text-indigo-700">{item.kolom}</p>
             </div>
-            <div className="rounded-lg bg-indigo-50 p-2 text-center">
+            <div className="min-w-0 rounded-lg bg-indigo-50 p-2 text-center">
               <p className="text-[10px] font-black uppercase text-indigo-600">Rak</p>
               <p className="mt-1 text-2xl font-black leading-none text-indigo-700">{item.rak}</p>
             </div>
           </div>
 
-          <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-sm">
-            <div>
+          <div className="mt-3 flex min-w-0 flex-wrap items-center justify-between gap-2 text-sm">
+            <div className="min-w-0">
               <p className="text-xs font-semibold text-gray-500">Stok / Harga</p>
               <p className="font-black text-gray-900">
                 {item.stock} pcs - {formatRupiah(item.price)}
@@ -416,27 +416,48 @@ export default function StaffLocator({ onBack }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-10">
+    <div className="min-h-screen overflow-x-hidden bg-slate-50 pb-10">
       <header className="sticky top-0 z-20 border-b border-gray-200 bg-white/95 shadow-sm backdrop-blur">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-3 py-3 sm:px-4">
-          <button
-            type="button"
-            onClick={onBack}
-            className="flex h-11 w-11 items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50"
-            aria-label="Kembali"
-          >
-            <BackIcon />
-          </button>
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <h1 className="truncate text-base font-black text-gray-900 md:text-lg">Lokasi Obat - Staff Panel</h1>
-              <span className="rounded-full border border-indigo-200 bg-indigo-50 px-2 py-0.5 text-[10px] font-black uppercase text-indigo-700 md:text-xs">
-                Mode Staff
-              </span>
+        <div className="w-full px-4 py-2.5 sm:mx-auto sm:max-w-6xl">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={onBack}
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 shadow-sm hover:bg-gray-50"
+              aria-label="Kembali"
+            >
+              <BackIcon />
+            </button>
+
+            <div className="min-w-0 flex-1">
+              <div className="flex min-w-0 items-center gap-2">
+                <h1 className="min-w-0 truncate text-[15px] font-black leading-tight text-gray-900 min-[390px]:text-base sm:text-lg">
+                  Lokasi Obat - Staff Panel
+                </h1>
+                <span className="shrink-0 rounded-full border border-indigo-200 bg-indigo-50 px-2 py-1 text-[9px] font-black uppercase leading-none text-indigo-700 min-[390px]:px-2.5 min-[390px]:text-[10px] md:text-xs">
+                  Mode Staff
+                </span>
+              </div>
+              <p className="mt-1 hidden truncate text-xs text-gray-500 sm:block">Cari stok dan lokasi fisik obat berdasarkan Storage, Kolom, dan Rak.</p>
             </div>
-            <p className="mt-0.5 truncate text-xs text-gray-500">Cari stok dan lokasi fisik obat dalam Storage, Kolom, dan Rak.</p>
+
+            <label className="hidden w-80 shrink-0 sm:block">
+              <span className="sr-only">Pilih Cabang</span>
+              <select
+                value={activeBranchId}
+                onChange={(event) => setActiveBranchId(event.target.value)}
+                className="min-h-11 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm font-bold text-gray-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+              >
+                {branches.map((branch) => (
+                  <option key={branch.id} value={branch.id}>
+                    {branch.name} - {branch.id}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
-          <label className="w-full sm:w-80">
+
+          <label className="mt-2 block sm:hidden">
             <span className="sr-only">Pilih Cabang</span>
             <select
               value={activeBranchId}
@@ -453,24 +474,17 @@ export default function StaffLocator({ onBack }) {
         </div>
       </header>
 
-      <main className="mx-auto grid max-w-6xl gap-4 px-3 py-4 sm:px-4 sm:py-5">
-        <section className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-          <SummaryCard label="Total Obat" value={inventoryRows.length} />
-          <SummaryCard label="Tersedia" value={availableRows.length} tone="emerald" />
-          <SummaryCard label="Menipis" value={lowStockRows.length} tone="amber" />
-          <SummaryCard label="Habis" value={outOfStockRows.length} tone="red" />
-        </section>
-
-        <section className="sticky top-[104px] z-10 rounded-lg border border-gray-200 bg-white/95 p-3 shadow-sm backdrop-blur sm:top-[73px] sm:p-4">
-          <div className="grid gap-3 md:grid-cols-[1fr_auto] md:items-center">
-            <div className="relative">
+      <main className="grid min-w-0 max-w-full gap-4 overflow-hidden py-3 sm:mx-auto sm:w-full sm:max-w-6xl sm:overflow-visible sm:px-4 sm:py-5">
+        <section className="relative z-10 min-w-0 max-w-full overflow-hidden rounded-none border-y border-gray-200 bg-white p-4 shadow-sm sm:sticky sm:top-[68px] sm:overflow-visible sm:rounded-lg sm:border sm:bg-white/95 sm:p-4 sm:backdrop-blur">
+          <div className="grid min-w-0 gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+            <div className="relative min-w-0">
               <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                 <SearchIcon />
               </span>
               <input
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
-                className="min-h-12 w-full rounded-full border border-gray-300 bg-gray-50 py-3 pl-12 pr-12 text-base font-semibold text-gray-900 outline-none placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+                className="min-h-12 w-full min-w-0 max-w-full rounded-full border border-gray-300 bg-gray-50 py-3 pl-12 pr-12 text-base font-semibold text-gray-900 outline-none placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
                 placeholder="Cari obat, kategori, atau indikasi..."
               />
               {searchQuery ? (
@@ -484,13 +498,13 @@ export default function StaffLocator({ onBack }) {
                 </button>
               ) : null}
             </div>
-            <div className="flex min-h-11 items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-sm font-bold text-amber-900">
+            <div className="flex min-h-11 min-w-0 items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-sm font-bold text-amber-900">
               <AlertIcon />
-              {lowStockRows.length} obat stok menipis
+              <span className="min-w-0 truncate">{lowStockRows.length} obat stok menipis</span>
             </div>
           </div>
 
-          <div className="scroll-fade mt-4 flex gap-2 overflow-x-auto pb-1">
+          <div className="scroll-fade mt-4 flex min-w-0 max-w-full gap-2 overflow-x-auto pb-1">
             {medicineCategories.map((category) => {
               const active = category === activeCategory;
               return (
@@ -520,11 +534,18 @@ export default function StaffLocator({ onBack }) {
           )}
         </section>
 
-        <div ref={locationCardRef}>
+        <section className="grid w-full min-w-0 max-w-full grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-3 px-4 sm:grid-cols-4 sm:px-0">
+          <SummaryCard label="Total Obat" value={inventoryRows.length} />
+          <SummaryCard label="Tersedia" value={availableRows.length} tone="emerald" />
+          <SummaryCard label="Menipis" value={lowStockRows.length} tone="amber" />
+          <SummaryCard label="Habis" value={outOfStockRows.length} tone="red" />
+        </section>
+
+        <div ref={locationCardRef} className="px-3 sm:px-0">
           <LocationCard item={selectedItem} onClose={() => setSelectedMedicineId(null)} />
         </div>
 
-        <section className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+        <section className="min-w-0 overflow-hidden rounded-none border-y border-gray-200 bg-white shadow-sm sm:rounded-lg sm:border">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 p-4">
             <div>
               <h2 className="text-base font-bold text-gray-900">Tabel Hasil Pencarian</h2>
@@ -553,11 +574,11 @@ export default function StaffLocator({ onBack }) {
             <span className="hidden text-xs font-medium text-gray-400 md:inline">Klik header tabel untuk sortir</span>
           </div>
 
-          <div className="p-3 md:hidden">
+          <div className="min-w-0 p-3 md:hidden">
             <MobileMedicineCards rows={filteredRows} selectedMedicineId={selectedMedicineId} onSelect={setSelectedMedicineId} />
           </div>
 
-          <div className="scroll-fade hidden overflow-x-auto md:block">
+          <div className="scroll-fade hidden w-full overflow-x-auto md:block">
             <table className="w-full min-w-[940px] text-sm">
               <thead className="bg-gray-50 text-xs uppercase tracking-wide text-gray-600">
                 <tr>
@@ -688,7 +709,7 @@ export default function StaffLocator({ onBack }) {
           ) : null}
         </section>
 
-        <section className="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
+        <section className="grid gap-4 px-3 sm:px-0 lg:grid-cols-[0.95fr_1.05fr]">
           <CustomerPanel
             customers={customers}
             activeCustomerId={activeCustomer?.id}
