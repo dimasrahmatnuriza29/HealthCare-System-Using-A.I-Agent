@@ -229,21 +229,6 @@ function buildInventoryRow(medicine, branchId) {
   };
 }
 
-function SummaryCard({ label, value, tone = 'slate' }) {
-  const toneClass = {
-    slate: 'border-slate-200 bg-white text-slate-900',
-    emerald: 'border-emerald-200 bg-emerald-50 text-emerald-900',
-    amber: 'border-amber-200 bg-amber-50 text-amber-900',
-    red: 'border-red-200 bg-red-50 text-red-900',
-  };
-
-  return (
-    <div className={`min-h-16 min-w-0 overflow-hidden rounded-lg border px-3 py-2.5 ${toneClass[tone]}`}>
-      <p className="text-[10px] font-bold uppercase tracking-wide opacity-70">{label}</p>
-      <p className="mt-1 text-xl font-black leading-none">{value}</p>
-    </div>
-  );
-}
 
 function WorkflowStepper({ currentStep, canOpenStep, onOpenStep }) {
   const currentIndex = workflowSteps.findIndex((step) => step.key === currentStep);
@@ -348,6 +333,7 @@ function SafetyCheckItem({ label, check }) {
 
 function MedicineCard({ item, customer, selected, onSelect }) {
   const preview = customer ? evaluateSafetyAdvisor(customer, item.medicine, item) : null;
+  const isInactive = item.stock === 0;
   const riskCheck =
     preview?.allergyCheck.status !== 'safe'
       ? preview.allergyCheck
@@ -365,49 +351,57 @@ function MedicineCard({ item, customer, selected, onSelect }) {
 
   return (
     <article
-      className={`min-w-0 overflow-hidden rounded-lg border bg-white p-3 shadow-sm transition ${
-        selected ? 'border-rose-400 ring-2 ring-rose-100' : 'border-gray-200 hover:border-gray-300'
+      className={`flex min-w-0 flex-col overflow-hidden rounded-lg border bg-white p-3 shadow-sm transition ${
+        isInactive
+          ? 'border-gray-200 bg-gray-50/70 opacity-70'
+          : selected
+            ? 'border-rose-400 ring-2 ring-rose-100'
+            : 'border-gray-200 hover:border-gray-300'
       }`}
     >
-      <div className="flex min-w-0 items-start justify-between gap-3">
+      <div className="grid min-w-0 grid-cols-1 items-start gap-2">
         <div className="min-w-0">
           <h3 className="break-words text-sm font-black leading-tight text-gray-900">{item.medicine.name}</h3>
-          <p className="mt-1 text-xs font-medium text-gray-500">
-            {item.medicine.dose} - {item.medicine.form} - {item.medicine.category}
+          <p className="mt-1 min-w-0 break-words text-[11px] font-semibold leading-4 text-gray-500">
+            {item.medicine.dose} · {item.medicine.form} · {item.medicine.category}
           </p>
         </div>
-        <span className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-black ${item.status.badgeClass}`}>
-          {item.status.label}
-        </span>
       </div>
 
-      <p className="mt-2 line-clamp-2 min-h-10 text-xs leading-5 text-gray-600">{item.medicine.indications.join(', ')}</p>
+      <p className="mt-2 line-clamp-2 min-w-0 text-xs leading-5 text-gray-600">{item.medicine.indications.join(', ')}</p>
 
       <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
-        <div className="rounded-lg border border-gray-100 bg-gray-50 p-2.5">
+        <div className="rounded-lg border border-gray-100 bg-gray-50 p-2">
           <p className="font-semibold text-gray-500">Stok</p>
-          <p className="mt-1 font-black text-gray-900">{item.stock === 0 ? 'Habis' : `${item.stock} pcs`}</p>
+          <p className="mt-0.5 font-black text-gray-900">{item.stock === 0 ? 'Habis' : `${item.stock} pcs`}</p>
         </div>
-        <div className="rounded-lg border border-gray-100 bg-gray-50 p-2.5">
+        <div className="rounded-lg border border-gray-100 bg-gray-50 p-2">
           <p className="font-semibold text-gray-500">Harga</p>
-          <p className="mt-1 font-black text-gray-900">{formatRupiah(item.price)}</p>
+          <p className="mt-0.5 min-w-0 break-all font-black text-gray-900">{formatRupiah(item.price)}</p>
         </div>
       </div>
 
       {riskCheck ? (
-        <div className={`mt-3 rounded-lg border px-3 py-2 text-xs font-semibold leading-5 ${riskClass}`}>
-          Perlu perhatian: {riskCheck.message}
+        <div
+          className={`mt-3 min-w-0 break-words rounded-lg border px-3 py-2 text-xs font-semibold leading-5 [overflow-wrap:anywhere] ${riskClass}`}
+        >
+          <span className="font-black">Perhatian: </span>{riskCheck.message}
         </div>
       ) : null}
 
       <button
         type="button"
-        onClick={() => onSelect(item.id)}
-        className={`mt-3 min-h-10 w-full rounded-lg px-3 py-2 text-sm font-bold ${
-          selected ? 'bg-gray-900 text-white hover:bg-black' : 'bg-rose-600 text-white hover:bg-rose-700'
+        onClick={() => !isInactive && onSelect(item.id)}
+        disabled={isInactive}
+        className={`mt-3 min-h-11 w-full rounded-lg px-3 py-2 text-sm font-bold ${
+          isInactive
+            ? 'cursor-not-allowed bg-gray-200 text-gray-500'
+            : selected
+              ? 'bg-gray-900 text-white hover:bg-black'
+              : 'bg-rose-600 text-white hover:bg-rose-700'
         }`}
       >
-        {selected ? 'Hapus dari Pilihan' : 'Tambah Obat'}
+        {isInactive ? 'Stok Habis' : selected ? 'Hapus dari Pilihan' : 'Tambah Obat'}
       </button>
     </article>
   );
@@ -415,9 +409,9 @@ function MedicineCard({ item, customer, selected, onSelect }) {
 
 function AdvancedStockTable({ rows, selectedMedicineIds, onSelect }) {
   return (
-    <details className="rounded-lg border border-gray-200 bg-white shadow-sm">
+    <details className="hidden min-w-0 rounded-lg border border-gray-200 bg-white shadow-sm md:block">
       <summary className="cursor-pointer px-4 py-3 text-sm font-bold text-gray-800">Lihat semua stok</summary>
-      <div className="scroll-fade overflow-x-auto border-t border-gray-100">
+      <div className="scroll-fade min-w-0 overflow-x-auto border-t border-gray-100">
         <table className="w-full min-w-[760px] text-sm">
           <thead className="bg-gray-50 text-xs uppercase tracking-wide text-gray-600">
             <tr>
@@ -425,7 +419,6 @@ function AdvancedStockTable({ rows, selectedMedicineIds, onSelect }) {
               <th className="px-4 py-3 text-left font-black">Dosis</th>
               <th className="px-4 py-3 text-left font-black">Kategori</th>
               <th className="px-4 py-3 text-left font-black">Stok</th>
-              <th className="px-4 py-3 text-left font-black">Status</th>
               <th className="px-4 py-3 text-left font-black">Harga</th>
               <th className="px-4 py-3 text-right font-black">Aksi</th>
             </tr>
@@ -433,24 +426,32 @@ function AdvancedStockTable({ rows, selectedMedicineIds, onSelect }) {
           <tbody className="divide-y divide-gray-100">
             {rows.map((item) => {
               const selected = selectedMedicineIds.includes(item.id);
+              const isInactive = item.stock === 0;
               return (
-              <tr key={`advanced-${item.id}`} className={selected ? 'bg-rose-50' : ''}>
+              <tr
+                key={`advanced-${item.id}`}
+                className={`${selected ? 'bg-rose-50' : ''} ${isInactive ? 'opacity-60' : ''}`}
+              >
                 <td className="px-4 py-3">
                   <p className="font-bold text-gray-900">{item.medicine.name}</p>
-                  <p className="mt-0.5 text-xs text-gray-500">{item.medicine.indications.join(', ')}</p>
+                  <p className="mt-0.5 text-xs text-gray-500 [overflow-wrap:anywhere]">
+                    {item.medicine.indications.join(', ')}
+                  </p>
                 </td>
                 <td className="px-4 py-3 text-gray-700">{item.medicine.dose}</td>
                 <td className="px-4 py-3 text-gray-700">{item.medicine.category}</td>
                 <td className="px-4 py-3 font-black text-gray-900">{item.stock}</td>
-                <td className="px-4 py-3">
-                  <span className={`rounded-full border px-2.5 py-1 text-xs font-black ${item.status.badgeClass}`}>{item.status.label}</span>
-                </td>
                 <td className="whitespace-nowrap px-4 py-3 font-bold text-gray-900">{formatRupiah(item.price)}</td>
                 <td className="px-4 py-3 text-right">
                   <button
                     type="button"
-                    onClick={() => onSelect(item.id)}
-                    className="inline-flex items-center rounded-lg bg-rose-600 px-3 py-2 text-xs font-bold text-white hover:bg-rose-700"
+                    onClick={() => !isInactive && onSelect(item.id)}
+                    disabled={isInactive}
+                    className={`inline-flex items-center rounded-lg px-3 py-2 text-xs font-bold ${
+                      isInactive
+                        ? 'cursor-not-allowed bg-gray-200 text-gray-500'
+                        : 'bg-rose-600 text-white hover:bg-rose-700'
+                    }`}
                   >
                     {selected ? 'Hapus' : 'Tambah'}
                   </button>
@@ -462,6 +463,45 @@ function AdvancedStockTable({ rows, selectedMedicineIds, onSelect }) {
         </table>
       </div>
     </details>
+  );
+}
+
+function SelectedMedicineTray({ selectedItems, onRemove }) {
+  if (!selectedItems.length) return null;
+
+  return (
+    <section className="rounded-lg border border-rose-200 bg-rose-50 p-3 shadow-sm">
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-[11px] font-black uppercase tracking-wide text-rose-700">Pilihan Saat Ini</p>
+          <p className="mt-1 text-xs font-semibold text-rose-900">{selectedItems.length} obat siap dicek keamanannya</p>
+        </div>
+        <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-xs font-black text-rose-700">{selectedItems.length}</span>
+      </div>
+      <div className="scroll-fade mt-3 flex min-w-0 gap-2 overflow-x-auto pb-2">
+        {selectedItems.map((item) => (
+          <div
+            key={`selected-tray-${item.id}`}
+            className="flex w-[min(220px,calc(100vw-2.5rem))] shrink-0 items-center justify-between gap-2 rounded-lg border border-rose-100 bg-white px-3 py-2"
+          >
+            <div className="min-w-0">
+              <p className="truncate text-xs font-black text-gray-900">{item.medicine.name}</p>
+              <p className="mt-0.5 truncate text-[11px] font-semibold text-gray-500">
+                {item.stock === 0 ? 'Habis' : `${item.stock} pcs`} · {formatRupiah(item.price)}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => onRemove(item.id)}
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200"
+              aria-label={`Hapus ${item.medicine.name} dari pilihan`}
+            >
+              <CloseIcon />
+            </button>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -982,10 +1022,6 @@ export default function StaffLocator({ onBack }) {
             {[activeBranch?.address, activeBranch?.city].filter(Boolean).join(', ')}
           </p>
         </div>
-        <div className="mt-4 grid grid-cols-2 gap-2">
-          <SummaryCard label="Total Obat" value={inventoryRows.length} />
-          <SummaryCard label="Menipis" value={lowStockRows.length} tone="amber" />
-        </div>
         {activeCustomer ? (
           <div className="mt-4 rounded-lg border border-emerald-100 bg-emerald-50 p-3">
             <p className="text-xs font-black uppercase tracking-wide text-emerald-700">Customer Dipilih</p>
@@ -1000,48 +1036,49 @@ export default function StaffLocator({ onBack }) {
   );
 
   const renderMedicineStep = () => (
-    <section className="grid gap-3 px-3 sm:px-0">
+    <section className="grid min-w-0 max-w-full gap-3 px-3 pb-36 sm:px-0 sm:pb-0">
       <CustomerContextStrip customer={activeCustomer} onChangeCustomer={() => setCurrentStep('customer')} />
 
-      <section className="grid w-full min-w-0 max-w-full grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-2.5 sm:grid-cols-4">
-        <SummaryCard label="Total Obat" value={inventoryRows.length} />
-        <SummaryCard label="Tersedia" value={availableRows.length} tone="emerald" />
-        <SummaryCard label="Menipis" value={lowStockRows.length} tone="amber" />
-        <SummaryCard label="Habis" value={outOfStockRows.length} tone="red" />
-      </section>
 
-      <section className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm">
-        <div className="grid min-w-0 gap-2.5 md:grid-cols-[minmax(0,1fr)_auto_auto] md:items-center">
-          <div className="relative min-w-0">
-            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-              <SearchIcon />
-            </span>
-            <input
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              className="min-h-10 w-full min-w-0 max-w-full rounded-lg border border-gray-300 bg-gray-50 py-2 pl-10 pr-10 text-sm font-semibold text-gray-900 outline-none placeholder:text-gray-400 focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
-              placeholder="Cari obat, kategori, atau indikasi..."
-            />
-            {searchQuery ? (
-              <button
-                type="button"
-                onClick={() => setSearchQuery('')}
-                className="absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300"
-                aria-label="Bersihkan pencarian"
-              >
-                <CloseIcon />
-              </button>
-            ) : null}
+      <section className="min-w-0 rounded-lg border border-gray-200 bg-white p-3 shadow-sm">
+        <div className="grid min-w-0 grid-cols-1 gap-2 sm:gap-2.5 sm:grid-cols-[minmax(0,1fr)_minmax(170px,0.42fr)] lg:grid-cols-[minmax(0,1fr)_auto_auto] lg:items-end">
+          <div className="min-w-0">
+            <label className="mb-1 block text-[11px] font-black uppercase tracking-wide text-gray-500" htmlFor="medicine-search">
+              Cari Obat
+            </label>
+            <div className="relative">
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                <SearchIcon />
+              </span>
+              <input
+                id="medicine-search"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                inputMode="search"
+                className="min-h-10 w-full min-w-0 max-w-full rounded-lg border border-gray-300 bg-gray-50 py-2 pl-9 pr-9 text-sm font-semibold text-gray-900 outline-none placeholder:text-gray-400 focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
+                placeholder="Cari nama obat..."
+              />
+              {searchQuery ? (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300"
+                  aria-label="Bersihkan pencarian"
+                >
+                  <CloseIcon />
+                </button>
+              ) : null}
+            </div>
           </div>
-          <label className="flex min-h-10 items-center gap-2 text-xs font-bold text-gray-600">
-            Urutkan
+          <label className="block min-w-0 text-xs font-bold text-gray-600">
+            <span className="mb-1 block text-[11px] font-black uppercase tracking-wide text-gray-500">Urutkan</span>
             <select
               value={`${sortConfig.key}:${sortConfig.direction}`}
               onChange={(event) => {
                 const [key, direction] = event.target.value.split(':');
                 setSortConfig({ key, direction });
               }}
-              className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-xs font-bold text-gray-900 outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
+              className="min-h-10 w-full min-w-0 rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-xs font-bold text-gray-900 outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
             >
               <option value="name:asc">Nama A-Z</option>
               <option value="name:desc">Nama Z-A</option>
@@ -1051,13 +1088,9 @@ export default function StaffLocator({ onBack }) {
               <option value="price:desc">Harga tertinggi</option>
             </select>
           </label>
-          <div className="flex min-h-10 min-w-0 items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-2 text-xs font-bold text-amber-900">
-            <AlertIcon />
-            <span className="min-w-0 truncate">{lowStockRows.length} stok menipis</span>
-          </div>
         </div>
 
-        <div className="scroll-fade mt-3 flex min-w-0 max-w-full gap-2 overflow-x-auto pb-1">
+        <div className="scroll-fade mt-3 flex min-w-0 max-w-full snap-x flex-nowrap gap-2 overflow-x-auto pb-1">
           {medicineCategories.map((category) => {
             const active = category === activeCategory;
             return (
@@ -1066,7 +1099,7 @@ export default function StaffLocator({ onBack }) {
                 type="button"
                 onClick={() => setActiveCategory(category)}
                 aria-pressed={active}
-                className={`min-h-8 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-bold transition ${
+                className={`min-h-9 shrink-0 snap-start whitespace-nowrap rounded-full border px-3 py-2 text-xs font-bold transition sm:px-3 ${
                   active
                     ? 'border-gray-900 bg-gray-900 text-white'
                     : 'border-gray-300 bg-white text-gray-700 hover:border-rose-300 hover:text-rose-700'
@@ -1079,8 +1112,10 @@ export default function StaffLocator({ onBack }) {
         </div>
       </section>
 
+      <SelectedMedicineTray selectedItems={selectedItems} onRemove={handleSelectMedicine} />
+
       <section className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm">
-        <div className="flex flex-wrap items-start justify-between gap-3 border-b border-gray-100 pb-3">
+        <div className="grid gap-2 border-b border-gray-100 pb-3 sm:flex sm:flex-wrap sm:items-start sm:justify-between">
           <div>
             <h2 className="text-sm font-black text-gray-900">Pilih Obat</h2>
             <p className="mt-1 text-xs text-gray-500">
@@ -1088,14 +1123,14 @@ export default function StaffLocator({ onBack }) {
             </p>
           </div>
           {selectedItems.length ? (
-            <span className="rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-xs font-bold text-rose-700">
+            <span className="w-fit rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-xs font-bold text-rose-700">
               {selectedItems.length} obat dipilih
             </span>
           ) : null}
         </div>
 
         {filteredRows.length ? (
-          <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-3 grid min-w-0 gap-2.5 sm:grid-cols-2 sm:gap-3 xl:grid-cols-3">
             {filteredRows.map((item) => (
               <MedicineCard
                 key={item.id}
@@ -1115,19 +1150,19 @@ export default function StaffLocator({ onBack }) {
 
       <AdvancedStockTable rows={filteredRows} selectedMedicineIds={selectedMedicineIds} onSelect={handleSelectMedicine} />
 
-      <section className="sticky bottom-0 z-10 -mx-3 border-t border-gray-200 bg-white/95 p-3 shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur sm:mx-0 sm:rounded-lg sm:border sm:shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="min-w-0">
-            <p className="text-xs font-black uppercase tracking-wide text-gray-500">Tahap berikutnya</p>
-            <p className="mt-1 truncate text-sm font-bold text-gray-900">
-              {selectedItems.length ? `Cek keamanan untuk ${selectedItems.length} obat` : 'Pilih minimal satu obat sebelum safety check'}
+      <section className="sticky bottom-0 z-10 -mx-3 min-w-0 border-t border-gray-200 bg-white/95 p-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur sm:mx-0 sm:rounded-lg sm:border sm:pb-3 sm:shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] font-black uppercase tracking-wide text-gray-500">Tahap berikutnya</p>
+            <p className="mt-0.5 truncate text-xs font-bold leading-5 text-gray-900 sm:text-sm">
+              {selectedItems.length ? `Cek keamanan ${selectedItems.length} obat` : 'Pilih minimal satu obat'}
             </p>
           </div>
           <button
             type="button"
             onClick={handleCheckSafety}
             disabled={!selectedItems.length}
-            className="min-h-11 rounded-lg bg-gray-900 px-4 py-2 text-sm font-bold text-white hover:bg-black disabled:cursor-not-allowed disabled:bg-gray-300"
+            className="min-h-11 shrink-0 whitespace-nowrap rounded-lg bg-gray-900 px-4 py-2 text-sm font-bold text-white hover:bg-black disabled:cursor-not-allowed disabled:bg-gray-300"
           >
             Cek Keamanan Obat
           </button>
@@ -1667,7 +1702,7 @@ export default function StaffLocator({ onBack }) {
         </div>
       </header>
 
-      <main className="grid min-w-0 max-w-full gap-3 overflow-hidden py-2.5 sm:mx-auto sm:w-full sm:max-w-6xl sm:overflow-visible sm:px-4 sm:py-4">
+      <main className="grid min-w-0 max-w-full gap-3 overflow-x-hidden py-2.5 sm:mx-auto sm:w-full sm:max-w-6xl sm:overflow-visible sm:px-4 sm:py-4">
         <WorkflowStepper currentStep={currentStep} canOpenStep={canOpenStep} onOpenStep={setCurrentStep} />
 
         {currentStep === 'customer' ? renderCustomerStep() : null}
