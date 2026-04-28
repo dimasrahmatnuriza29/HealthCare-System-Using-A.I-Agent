@@ -170,6 +170,91 @@ function AlertIcon() {
   );
 }
 
+function InfoIcon() {
+  return (
+    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 16v-4m0-4h.01" />
+      <circle cx="12" cy="12" r="10" />
+    </svg>
+  );
+}
+
+function RiskChipIcon({ status = 'warning' }) {
+  const toneClass =
+    status === 'danger'
+      ? 'bg-red-600 text-white'
+      : status === 'warning'
+        ? 'bg-amber-500 text-white'
+        : 'bg-emerald-600 text-white';
+
+  return (
+    <span className={`inline-flex h-7 w-7 items-center justify-center rounded-full shadow-sm ${toneClass}`}>
+      {status === 'danger' ? (
+        <AlertIcon />
+      ) : status === 'warning' ? (
+        <InfoIcon />
+      ) : (
+        <CheckIcon />
+      )}
+    </span>
+  );
+}
+
+function RiskDetailModal({ open, title, status, message, onClose }) {
+  if (!open) return null;
+
+  const panelTone =
+    status === 'danger'
+      ? 'border-red-200 bg-red-50'
+      : status === 'warning'
+        ? 'border-amber-200 bg-amber-50'
+        : 'border-emerald-200 bg-emerald-50';
+
+  const titleTone =
+    status === 'danger' ? 'text-red-900' : status === 'warning' ? 'text-amber-900' : 'text-emerald-900';
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <button
+        type="button"
+        className="absolute inset-0 bg-black/40"
+        onClick={onClose}
+        aria-label="Tutup detail risiko"
+      />
+      <div className={`relative w-full max-w-md rounded-xl border p-4 shadow-xl ${panelTone} `}>
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-[11px] font-black uppercase tracking-wide text-gray-600">Detail Risiko</p>
+            <h3 className={`mt-1 break-words text-base font-black ${titleTone}`}>{title}</h3>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/70 text-gray-700 hover:bg-white"
+            aria-label="Tutup"
+          >
+            <CloseIcon />
+          </button>
+        </div>
+
+        <div className="mt-3 rounded-lg border border-white/60 bg-white/60 p-3">
+          <p className="text-xs font-semibold leading-6 text-gray-800 [overflow-wrap:anywhere]">{message}</p>
+        </div>
+
+        <div className="mt-4 flex justify-end">
+          <button
+            type="button"
+            onClick={onClose}
+            className="min-h-10 rounded-lg bg-gray-900 px-4 py-2 text-sm font-bold text-white hover:bg-black"
+          >
+            Mengerti
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function CheckIcon() {
   return (
     <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
@@ -334,6 +419,7 @@ function SafetyCheckItem({ label, check }) {
 function MedicineCard({ item, customer, selected, onSelect }) {
   const preview = customer ? evaluateSafetyAdvisor(customer, item.medicine, item) : null;
   const isInactive = item.stock === 0;
+  const [showRiskDetail, setShowRiskDetail] = useState(false);
   const riskCheck =
     preview?.allergyCheck.status !== 'safe'
       ? preview.allergyCheck
@@ -342,23 +428,31 @@ function MedicineCard({ item, customer, selected, onSelect }) {
         : preview?.interactionCheck.status !== 'safe'
           ? preview.interactionCheck
           : null;
-  const riskClass =
-    riskCheck?.status === 'danger'
-      ? 'border-red-200 bg-red-50 text-red-800'
-      : riskCheck?.status === 'warning'
-        ? 'border-amber-200 bg-amber-50 text-amber-800'
-        : 'border-gray-100 bg-gray-50 text-gray-600';
+  const riskStatus = riskCheck?.status ?? 'safe';
+  const hasRisk = Boolean(riskCheck && riskStatus !== 'safe');
 
   return (
-    <article
-      className={`flex min-w-0 flex-col overflow-hidden rounded-lg border bg-white p-3 shadow-sm transition ${
-        isInactive
-          ? 'border-gray-200 bg-gray-50/70 opacity-70'
-          : selected
-            ? 'border-rose-400 ring-2 ring-rose-100'
-            : 'border-gray-200 hover:border-gray-300'
-      }`}
-    >
+    <>
+      <article
+        className={`relative flex min-w-0 flex-col overflow-hidden rounded-lg border bg-white p-3 shadow-sm transition ${
+          isInactive
+            ? 'border-gray-200 bg-gray-50/70 opacity-70'
+            : selected
+              ? 'border-rose-400 ring-2 ring-rose-100'
+              : 'border-gray-200 hover:border-gray-300'
+        }`}
+      >
+        {hasRisk ? (
+          <button
+            type="button"
+            className="absolute right-2 top-2 z-10"
+            onClick={() => setShowRiskDetail(true)}
+            aria-label="Lihat detail risiko"
+          >
+            <RiskChipIcon status={riskStatus} />
+          </button>
+        ) : null}
+
       <div className="grid min-w-0 grid-cols-1 items-start gap-2">
         <div className="min-w-0">
           <h3 className="break-words text-sm font-black leading-tight text-gray-900">{item.medicine.name}</h3>
@@ -381,14 +475,6 @@ function MedicineCard({ item, customer, selected, onSelect }) {
         </div>
       </div>
 
-      {riskCheck ? (
-        <div
-          className={`mt-3 min-w-0 break-words rounded-lg border px-3 py-2 text-xs font-semibold leading-5 [overflow-wrap:anywhere] ${riskClass}`}
-        >
-          <span className="font-black">Perhatian: </span>{riskCheck.message}
-        </div>
-      ) : null}
-
       <button
         type="button"
         onClick={() => !isInactive && onSelect(item.id)}
@@ -403,7 +489,16 @@ function MedicineCard({ item, customer, selected, onSelect }) {
       >
         {isInactive ? 'Stok Habis' : selected ? 'Hapus dari Pilihan' : 'Tambah Obat'}
       </button>
-    </article>
+      </article>
+
+      <RiskDetailModal
+        open={showRiskDetail}
+        title={item.medicine.name}
+        status={riskStatus}
+        message={riskCheck?.message ?? ''}
+        onClose={() => setShowRiskDetail(false)}
+      />
+    </>
   );
 }
 
