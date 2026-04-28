@@ -319,7 +319,7 @@ function Sidebar({ onOpenStaff, onOpenHistory, onOpenMaster, onOpenStock }) {
 
 // ── Cards ──────────────────────────────────────────────────────────────────
 
-function MetricCard({ label, value, helper, icon, tone = 'neutral' }) {
+function MetricCard({ label, value, helper, icon, tone = 'neutral', onClick }) {
   const tones = {
     neutral: {
       card: 'bg-white border-gray-200',
@@ -344,8 +344,16 @@ function MetricCard({ label, value, helper, icon, tone = 'neutral' }) {
     },
   };
   const t = tones[tone] ?? tones.neutral;
+  const Wrapper = onClick ? 'button' : 'div';
+
   return (
-    <div className={`rounded-xl border p-4 shadow-sm ${t.card}`}>
+    <Wrapper
+      type={onClick ? 'button' : undefined}
+      onClick={onClick}
+      className={`w-full rounded-xl border p-4 text-left shadow-sm transition ${t.card} ${
+        onClick ? 'hover:border-gray-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-rose-500' : ''
+      }`}
+    >
       <div className="flex items-center gap-4">
         <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${t.icon}`}>
           {icon}
@@ -356,7 +364,7 @@ function MetricCard({ label, value, helper, icon, tone = 'neutral' }) {
           <p className={`text-[11px] ${t.helper}`}>{helper}</p>
         </div>
       </div>
-    </div>
+    </Wrapper>
   );
 }
 
@@ -590,6 +598,7 @@ export default function ServiceSelection({ onOpenStaff, onOpenHistory, onOpenMas
               value={lowStock}
               helper="Perlu restock"
               tone="amber"
+              onClick={() => lowStock > 0 && onOpenStock?.({ filter: 'low' })}
             />
             <MetricCard
               icon={<BanIcon className="h-5 w-5" />}
@@ -597,6 +606,7 @@ export default function ServiceSelection({ onOpenStaff, onOpenHistory, onOpenMas
               value={outOfStock}
               helper="Tidak tersedia"
               tone="red"
+              onClick={() => outOfStock > 0 && onOpenStock?.({ filter: 'out' })}
             />
           </section>
 

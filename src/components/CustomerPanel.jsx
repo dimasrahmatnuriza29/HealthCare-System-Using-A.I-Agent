@@ -8,6 +8,168 @@ import {
   specialConditionOptions,
 } from '../data/customerRecords.js';
 
+function SearchIcon({ className = 'h-5 w-5' }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-4.35-4.35M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z" />
+    </svg>
+  );
+}
+
+function ChevronRightIcon({ className = 'h-5 w-5' }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3">
+      <path strokeLinecap="round" strokeLinejoin="round" d="m9 18 6-6-6-6" />
+    </svg>
+  );
+}
+
+function ClockIcon({ className = 'h-4 w-4' }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <circle cx="12" cy="12" r="10" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" />
+    </svg>
+  );
+}
+
+function ClipboardIcon({ className = 'h-4 w-4' }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5h6" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 3h6a2 2 0 0 1 2 2v1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h1V5a2 2 0 0 1 2-2Z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h8M8 16h5" />
+    </svg>
+  );
+}
+
+function UserIcon({ className = 'h-10 w-10' }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" />
+    </svg>
+  );
+}
+
+function CheckCircleIcon({ className = 'h-5 w-5' }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M22 4 12 14.01l-3-3" />
+    </svg>
+  );
+}
+
+function PlusIcon({ className = 'h-4 w-4' }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14M5 12h14" />
+    </svg>
+  );
+}
+
+function ArrowRightIcon({ className = 'h-4 w-4' }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
+    </svg>
+  );
+}
+
+function Badge({ children, tone = 'gray' }) {
+  const toneClass =
+    tone === 'danger'
+      ? 'border-rose-200 bg-rose-50 text-rose-700'
+      : tone === 'success'
+        ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+        : tone === 'warning'
+          ? 'border-amber-200 bg-amber-50 text-amber-800'
+          : tone === 'violet'
+            ? 'border-violet-200 bg-violet-50 text-violet-700'
+            : 'border-gray-200 bg-gray-50 text-gray-700';
+
+  return (
+    <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${toneClass}`}>
+      {children}
+    </span>
+  );
+}
+
+
+function CustomerAvatar({ name, active }) {
+  const initials = (name || '?')
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((chunk) => chunk[0]?.toUpperCase())
+    .join('');
+
+  return (
+    <div className="relative shrink-0">
+      <div
+        className={`flex h-11 w-11 items-center justify-center rounded-full border text-sm font-black ${
+          active ? 'border-rose-200 bg-rose-50 text-rose-700' : 'border-gray-200 bg-gray-50 text-gray-600'
+        }`}
+      >
+        {initials || <UserIcon className="h-5 w-5" />}
+      </div>
+      {active ? (
+        <span className="absolute -bottom-1 -right-1 inline-flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-rose-600 text-white">
+          <CheckCircleIcon className="h-4 w-4" />
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
+function CustomerCard({ customer, active, onClick }) {
+  const allergyBadges = customer.allergies.slice(0, 2);
+  const extraAllergyCount = Math.max(0, customer.allergies.length - allergyBadges.length);
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`group flex w-full items-center justify-between gap-3 rounded-2xl border p-3 text-left transition ${
+        active
+          ? 'border-rose-300 bg-rose-50/70'
+          : 'border-gray-200 bg-white hover:border-rose-200 hover:bg-rose-50/30'
+      }`}
+    >
+      <div className="flex min-w-0 items-center gap-3">
+        <CustomerAvatar name={customer.name} active={active} />
+        <div className="min-w-0">
+          <p className="truncate text-sm font-black text-gray-900">{customer.name}</p>
+          <p className="mt-0.5 text-xs text-gray-500">
+            {customer.age} tahun · {getAgeCategoryLabel(customer.ageCategory)}
+          </p>
+          <p className="mt-0.5 text-xs text-gray-500">{customer.phone}</p>
+        </div>
+      </div>
+
+      <div className="flex shrink-0 items-center gap-2">
+        <div className="hidden shrink-0 flex-wrap items-center justify-end gap-1 sm:flex">
+          <Badge tone="violet">{getAgeCategoryLabel(customer.ageCategory)}</Badge>
+          {customer.allergies.length ? (
+            <>
+              {allergyBadges.map((allergy) => (
+                <Badge key={allergy} tone="danger">
+                  {allergy}
+                </Badge>
+              ))}
+              {extraAllergyCount ? <Badge tone="danger">+{extraAllergyCount}</Badge> : null}
+            </>
+          ) : (
+            <Badge tone="gray">Tidak ada alergi</Badge>
+          )}
+        </div>
+        {!active ? <ChevronRightIcon className="h-5 w-5 text-gray-300 group-hover:text-gray-400" /> : null}
+      </div>
+    </button>
+  );
+}
+
 const emptyForm = {
   name: '',
   phone: '',
@@ -67,226 +229,284 @@ export default function CustomerPanel({ customers, activeCustomerId, onSelectCus
     onContinue?.(record);
   };
 
+  const activeAllergies = activeCustomer?.allergies ?? [];
+  const activeConditions = activeCustomer?.conditions ?? [];
+
   return (
-    <section className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm sm:p-4">
-      <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+    <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+      <div className="grid gap-4 p-3 sm:p-4 lg:grid-cols-[1.55fr_1fr]">
         <div>
-          <h2 className="text-base font-bold text-gray-900">Customer Record</h2>
-          <p className="mt-1 text-xs leading-5 text-gray-500">Cari customer lama atau buat customer baru sebelum memilih obat.</p>
-        </div>
-        <button
-          type="button"
-          onClick={() => setShowNewCustomer((value) => !value)}
-          className="flex min-h-10 items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-bold text-rose-700 hover:bg-rose-100"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-4">
-            <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM2.615 16.428a1.224 1.224 0 0 1-.569-1.175 6.002 6.002 0 0 1 11.908 0c.058.467-.172.92-.57 1.174A9.953 9.953 0 0 1 8 18a9.953 9.953 0 0 1-5.385-1.572ZM16.25 5.75a.75.75 0 0 0-1.5 0v2h-2a.75.75 0 0 0 0 1.5h2v2a.75.75 0 0 0 1.5 0v-2h2a.75.75 0 0 0 0-1.5h-2v-2Z" />
-          </svg>
-          Customer Baru
-        </button>
-      </div>
-
-      <label className="block text-xs font-bold uppercase tracking-wide text-gray-500" htmlFor="customer-search">
-        Cari Customer Lama
-      </label>
-      <input
-        id="customer-search"
-        value={query}
-        onChange={(event) => setQuery(event.target.value)}
-        className="mt-2 min-h-11 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm font-medium text-gray-900 outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
-        placeholder="Nama atau nomor HP"
-      />
-
-      <div className="mt-3 grid max-h-80 gap-2 overflow-y-auto pr-1">
-        {filteredCustomers.map((customer) => {
-          const active = customer.id === activeCustomer?.id;
-          return (
+          <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 className="text-base font-black text-gray-900">Pilih Customer</h2>
+              <p className="mt-1 text-xs leading-5 text-gray-500">Cari customer lama atau buat customer baru sebelum memilih obat.</p>
+            </div>
             <button
               type="button"
-              key={customer.id}
-              onClick={() => onSelectCustomer(customer.id)}
-              className={`min-h-24 rounded-lg border p-3 text-left transition ${
-                active
-                  ? 'border-rose-300 bg-rose-50'
-                  : 'border-gray-200 bg-white hover:border-rose-200 hover:bg-rose-50/40'
-              }`}
+              onClick={() => setShowNewCustomer((value) => !value)}
+              className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-black text-rose-700 hover:bg-rose-100"
             >
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-bold text-gray-900">{customer.name}</p>
-                <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-semibold text-gray-600">
-                  {getAgeCategoryLabel(customer.ageCategory)}
-                </span>
-              </div>
-              <p className="mt-1 text-xs text-gray-500">
-                {customer.phone} - {customer.age} tahun
-              </p>
-              <p className="mt-1 text-xs text-rose-700">
-                Alergi: {customer.allergies.length ? customer.allergies.join(', ') : 'Tidak ada'}
-              </p>
+              <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-rose-600 text-white">
+                <PlusIcon className="h-4 w-4" />
+              </span>
+              Customer Baru
             </button>
-          );
-        })}
-      </div>
-
-      {showNewCustomer ? (
-        <form onSubmit={handleCreateCustomer} className="mt-4 border-t border-gray-100 pt-4">
-          <h3 className="text-sm font-bold text-gray-900">Registrasi Customer Baru</h3>
-          <div className="mt-3 grid gap-3 sm:grid-cols-2">
-            <label className="block">
-              <span className="text-xs font-bold uppercase tracking-wide text-gray-500">Nama lengkap</span>
-              <input
-                value={form.name}
-                onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
-                className="mt-1 min-h-11 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
-                placeholder="Contoh: Budi Santoso"
-                required
-              />
-            </label>
-            <label className="block">
-              <span className="text-xs font-bold uppercase tracking-wide text-gray-500">Nomor HP</span>
-              <input
-                value={form.phone}
-                onChange={(event) => setForm((current) => ({ ...current, phone: event.target.value }))}
-                className="mt-1 min-h-11 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
-                placeholder="Contoh: 081234567890"
-                required
-              />
-            </label>
-            <label className="block">
-              <span className="text-xs font-bold uppercase tracking-wide text-gray-500">Umur</span>
-              <input
-                value={form.age}
-                onChange={(event) => setForm((current) => ({ ...current, age: event.target.value }))}
-                className="mt-1 min-h-11 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
-                placeholder="Contoh: 32"
-                inputMode="numeric"
-                required
-              />
-            </label>
-            <label className="block">
-              <span className="text-xs font-bold uppercase tracking-wide text-gray-500">Jenis kelamin</span>
-              <select
-                value={form.gender}
-                onChange={(event) =>
-                  setForm((current) => ({
-                    ...current,
-                    gender: event.target.value,
-                    conditions:
-                      event.target.value === 'male'
-                        ? current.conditions.filter((conditionKey) => !femaleOnlyConditionKeys.has(conditionKey))
-                        : current.conditions,
-                  }))
-                }
-                className="mt-1 min-h-11 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
-              >
-                <option value="male">Laki-laki</option>
-                <option value="female">Perempuan</option>
-              </select>
-            </label>
           </div>
-          <label className="mt-3 block">
-            <span className="text-xs font-bold uppercase tracking-wide text-gray-500">Alergi obat</span>
+
+          <div className="relative mt-2">
             <input
-              value={form.allergies}
-              onChange={(event) => setForm((current) => ({ ...current, allergies: event.target.value }))}
-              className="mt-1 min-h-11 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
-              placeholder={`Pisahkan dengan koma, contoh: ${commonAllergies.slice(0, 3).join(', ')}`}
+              id="customer-search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              className="min-h-11 w-full rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-3 py-2.5 text-sm font-semibold text-gray-900 outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
+              placeholder="Cari nama atau nomor HP"
             />
-          </label>
-          <div className="mt-3">
-            <p className="text-xs font-bold uppercase tracking-wide text-gray-500">Kondisi medis penting</p>
-            <div className="mt-2 grid max-h-52 gap-2 overflow-y-auto pr-1 sm:grid-cols-2">
-              {visibleConditionOptions.map((condition) => (
-                <label key={condition.key} className="flex min-h-10 items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium text-gray-700">
-                  <input
-                    type="checkbox"
-                    checked={form.conditions.includes(condition.key)}
-                    onChange={() => toggleCondition(condition.key)}
-                    className="h-4 w-4 rounded border-gray-300 text-rose-600 focus:ring-rose-500"
-                  />
-                  {condition.label}
-                </label>
-              ))}
-            </div>
-          </div>
-          <label className="mt-3 block">
-            <span className="text-xs font-bold uppercase tracking-wide text-gray-500">Catatan medis tambahan</span>
-            <textarea
-              value={form.note}
-              onChange={(event) => setForm((current) => ({ ...current, note: event.target.value }))}
-              className="mt-1 min-h-20 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
-              placeholder="Contoh: keluhan pelanggan, instruksi apoteker, atau catatan riwayat penting."
-            />
-          </label>
-          <button type="submit" className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-rose-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-rose-700">
-            Simpan & Lanjut Pilih Obat
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-4">
-              <path fillRule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.638L10.23 5.29a.75.75 0 1 1 1.04-1.08l5.5 5.25a.75.75 0 0 1 0 1.08l-5.5 5.25a.75.75 0 1 1-1.04-1.08l4.158-3.96H3.75A.75.75 0 0 1 3 10Z" clipRule="evenodd" />
-            </svg>
-          </button>
-        </form>
-      ) : null}
-
-      {activeCustomer ? (
-        <div className="mt-4 border-t border-gray-100 pt-4">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="text-[11px] font-black uppercase tracking-wide text-gray-500">Customer Aktif</p>
-              <p className="text-sm font-bold text-gray-900">
-                {activeCustomer.name} - {activeCustomer.age} tahun - {getAgeCategoryLabel(activeCustomer.ageCategory)}
-              </p>
-              <p className="mt-1 text-xs text-gray-500">{activeCustomer.phone}</p>
-            </div>
-            <span className="rounded-full border border-violet-200 bg-violet-50 px-2.5 py-1 text-[11px] font-bold text-violet-700">
-              Aktif
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+              <SearchIcon className="h-5 w-5" />
             </span>
           </div>
 
-          <div className="mt-3 grid gap-2 text-xs">
-            <p className="rounded-lg bg-rose-50 px-3 py-2 font-medium text-rose-800">
-              Alergi: {activeCustomer.allergies.length ? activeCustomer.allergies.join(', ') : 'Tidak ada'}
-            </p>
-            <p className="rounded-lg bg-amber-50 px-3 py-2 font-medium text-amber-800">
-              Kondisi: {activeCustomer.conditions.length ? activeCustomer.conditions.map(getConditionLabel).join(', ') : 'Tidak ada'}
-            </p>
+          <div className="scroll-fade mt-3 grid max-h-[420px] gap-2 overflow-y-auto pr-1">
+            {filteredCustomers.map((customer) => {
+              const active = customer.id === activeCustomer?.id;
+              return (
+                <CustomerCard
+                  key={customer.id}
+                  customer={customer}
+                  active={active}
+                  onClick={() => onSelectCustomer(customer.id)}
+                />
+              );
+            })}
           </div>
 
-          <div className="mt-4">
-            <p className="text-xs font-bold uppercase tracking-wide text-gray-500">Riwayat Obat</p>
-            <div className="mt-2 grid gap-2">
-              {activeCustomer.medicineHistory.slice(0, 3).map((history) => (
-                <div key={`${history.date}-${history.medicineId}`} className="rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 text-xs text-gray-700">
-                  <span className="font-bold text-gray-900">{history.date}</span> - {history.medicineName} ({history.reason})
+          {showNewCustomer ? (
+            <form onSubmit={handleCreateCustomer} className="mt-4 rounded-2xl border border-gray-100 bg-gray-50 p-3 sm:p-4">
+              <h3 className="text-sm font-black text-gray-900">Customer Baru</h3>
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                <label className="block">
+                  <span className="text-[11px] font-black uppercase tracking-wide text-gray-500">Nama lengkap</span>
+                  <input
+                    value={form.name}
+                    onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
+                    className="mt-1 min-h-11 w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm font-semibold outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
+                    placeholder="Contoh: Budi Santoso"
+                    required
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-[11px] font-black uppercase tracking-wide text-gray-500">Nomor HP</span>
+                  <input
+                    value={form.phone}
+                    onChange={(event) => setForm((current) => ({ ...current, phone: event.target.value }))}
+                    className="mt-1 min-h-11 w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm font-semibold outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
+                    placeholder="Contoh: 081234567890"
+                    required
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-[11px] font-black uppercase tracking-wide text-gray-500">Umur</span>
+                  <input
+                    value={form.age}
+                    onChange={(event) => setForm((current) => ({ ...current, age: event.target.value }))}
+                    className="mt-1 min-h-11 w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm font-semibold outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
+                    placeholder="Contoh: 32"
+                    inputMode="numeric"
+                    required
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-[11px] font-black uppercase tracking-wide text-gray-500">Jenis kelamin</span>
+                  <select
+                    value={form.gender}
+                    onChange={(event) =>
+                      setForm((current) => ({
+                        ...current,
+                        gender: event.target.value,
+                        conditions:
+                          event.target.value === 'male'
+                            ? current.conditions.filter((conditionKey) => !femaleOnlyConditionKeys.has(conditionKey))
+                            : current.conditions,
+                      }))
+                    }
+                    className="mt-1 min-h-11 w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm font-semibold outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
+                  >
+                    <option value="male">Laki-laki</option>
+                    <option value="female">Perempuan</option>
+                  </select>
+                </label>
+              </div>
+              <label className="mt-3 block">
+                <span className="text-[11px] font-black uppercase tracking-wide text-gray-500">Alergi obat</span>
+                <input
+                  value={form.allergies}
+                  onChange={(event) => setForm((current) => ({ ...current, allergies: event.target.value }))}
+                  className="mt-1 min-h-11 w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm font-semibold outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
+                  placeholder={`Pisahkan dengan koma, contoh: ${commonAllergies.slice(0, 3).join(', ')}`}
+                />
+              </label>
+              <div className="mt-3">
+                <p className="text-[11px] font-black uppercase tracking-wide text-gray-500">Kondisi medis penting</p>
+                <div className="scroll-fade mt-2 grid max-h-52 gap-2 overflow-y-auto pr-1 sm:grid-cols-2">
+                  {visibleConditionOptions.map((condition) => (
+                    <label
+                      key={condition.key}
+                      className="flex min-h-10 items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={form.conditions.includes(condition.key)}
+                        onChange={() => toggleCondition(condition.key)}
+                        className="h-4 w-4 rounded border-gray-300 text-rose-600 focus:ring-rose-500"
+                      />
+                      {condition.label}
+                    </label>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-4">
-            <p className="text-xs font-bold uppercase tracking-wide text-gray-500">Catatan Staff</p>
-            <div className="mt-2 grid gap-2">
-              {activeCustomer.notes.slice(0, 2).map((note) => (
-                <div key={`${note.date}-${note.text}`} className="rounded-lg border border-violet-100 bg-violet-50 px-3 py-2 text-xs text-gray-700">
-                  <span className="font-bold text-violet-800">{note.date}</span> - {note.text}
-                </div>
-              ))}
-            </div>
-          </div>
+              </div>
+              <label className="mt-3 block">
+                <span className="text-[11px] font-black uppercase tracking-wide text-gray-500">Catatan medis tambahan</span>
+                <textarea
+                  value={form.note}
+                  onChange={(event) => setForm((current) => ({ ...current, note: event.target.value }))}
+                  className="mt-1 min-h-20 w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm font-semibold outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
+                  placeholder="Contoh: keluhan pelanggan, instruksi apoteker, atau catatan riwayat penting."
+                />
+              </label>
+              <button
+                type="submit"
+                className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-rose-600 px-4 py-3 text-sm font-black text-white hover:bg-rose-700"
+              >
+                Simpan & Lanjut Pilih Obat
+                <ArrowRightIcon className="h-4 w-4" />
+              </button>
+            </form>
+          ) : null}
         </div>
-      ) : null}
+
+        <aside className="space-y-3">
+          <div className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm sm:p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-[11px] font-black uppercase tracking-wide text-gray-500">Customer Aktif</p>
+                {activeCustomer ? (
+                  <div className="mt-2 flex items-center gap-3">
+                    <CustomerAvatar name={activeCustomer.name} active />
+                    <div>
+                      <p className="text-sm font-black text-gray-900">{activeCustomer.name}</p>
+                      <p className="mt-0.5 text-xs text-gray-500">
+                        {activeCustomer.age} tahun · {getAgeCategoryLabel(activeCustomer.ageCategory)}
+                      </p>
+                      <p className="mt-0.5 text-xs text-gray-500">{activeCustomer.phone}</p>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="mt-2 text-xs font-semibold text-gray-500">Belum ada customer dipilih.</p>
+                )}
+              </div>
+              {activeCustomer ? (
+                <span className="inline-flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-1 text-[11px] font-black text-emerald-700">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                  Aktif
+                </span>
+              ) : null}
+            </div>
+
+            {activeCustomer ? (
+              <>
+                <div className="mt-4">
+                  <p className="text-[11px] font-black uppercase tracking-wide text-gray-500">Alergi</p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {activeAllergies.length ? (
+                      activeAllergies.map((allergy) => (
+                        <Badge key={allergy} tone="danger">
+                          {allergy}
+                        </Badge>
+                      ))
+                    ) : (
+                      <Badge tone="gray">Tidak ada alergi</Badge>
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-4">
+                  <p className="text-[11px] font-black uppercase tracking-wide text-gray-500">Kondisi Medis</p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {activeConditions.length ? (
+                      activeConditions.map((condition) => (
+                        <Badge key={condition} tone="warning">
+                          {getConditionLabel(condition)}
+                        </Badge>
+                      ))
+                    ) : (
+                      <Badge tone="gray">Tidak ada</Badge>
+                    )}
+                  </div>
+                </div>
+              </>
+            ) : null}
+          </div>
+
+          {activeCustomer ? (
+            <div className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm sm:p-4">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-[11px] font-black uppercase tracking-wide text-gray-500">Riwayat Obat</p>
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-gray-200 bg-gray-50 text-gray-500">
+                  <ClockIcon className="h-4 w-4" />
+                </span>
+              </div>
+              <div className="mt-2 grid gap-2">
+                {activeCustomer.medicineHistory.slice(0, 3).map((history) => (
+                  <div
+                    key={`${history.date}-${history.medicineId}`}
+                    className="rounded-xl border border-gray-100 bg-gray-50 px-3 py-2 text-xs text-gray-700"
+                  >
+                    <p className="font-black text-gray-900">{history.medicineName}</p>
+                    <p className="mt-0.5 text-[11px] text-gray-500">
+                      {history.date} · {history.reason}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          {activeCustomer ? (
+            <div className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm sm:p-4">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-[11px] font-black uppercase tracking-wide text-gray-500">Catatan Staff</p>
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-gray-200 bg-gray-50 text-gray-500">
+                  <ClipboardIcon className="h-4 w-4" />
+                </span>
+              </div>
+              <div className="mt-2 grid gap-2">
+                {activeCustomer.notes.slice(0, 2).map((note) => (
+                  <div
+                    key={`${note.date}-${note.text}`}
+                    className="rounded-xl border border-violet-100 bg-violet-50 px-3 py-2 text-xs text-gray-700"
+                  >
+                    <p className="font-black text-violet-900">{note.text}</p>
+                    <p className="mt-0.5 text-[11px] text-violet-700">{note.date} · Staff</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
+        </aside>
+      </div>
 
       {onContinue ? (
-        <button
-          type="button"
-          onClick={() => activeCustomer && onContinue(activeCustomer)}
-          disabled={!activeCustomer}
-          className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-3 text-sm font-bold text-white hover:bg-black disabled:cursor-not-allowed disabled:bg-gray-300"
-        >
-          Lanjut Pilih Obat
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-4">
-            <path fillRule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.638L10.23 5.29a.75.75 0 1 1 1.04-1.08l5.5 5.25a.75.75 0 0 1 0 1.08l-5.5 5.25a.75.75 0 1 1-1.04-1.08l4.158-3.96H3.75A.75.75 0 0 1 3 10Z" clipRule="evenodd" />
-          </svg>
-        </button>
+        <div className="sticky bottom-0 z-10 border-t border-gray-100 bg-white/90 p-3 backdrop-blur sm:p-4">
+          <button
+            type="button"
+            onClick={() => activeCustomer && onContinue(activeCustomer)}
+            disabled={!activeCustomer}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-rose-600 px-4 py-3 text-sm font-black text-white hover:bg-rose-700 disabled:cursor-not-allowed disabled:bg-gray-300"
+          >
+            Lanjut Pilih Obat
+            <ArrowRightIcon className="h-4 w-4" />
+          </button>
+        </div>
       ) : null}
     </section>
   );

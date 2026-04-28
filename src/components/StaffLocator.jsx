@@ -367,30 +367,90 @@ function WorkflowStepper({ currentStep, canOpenStep, onOpenStep }) {
 function CustomerContextStrip({ customer, onChangeCustomer }) {
   if (!customer) return null;
 
+  const initials = (customer.name || '?')
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((chunk) => chunk[0]?.toUpperCase())
+    .join('');
+
   return (
-    <section className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-[11px] font-black uppercase tracking-wide text-gray-500">Customer Aktif</p>
-          <h2 className="mt-1 truncate text-base font-black text-gray-900">{customer.name}</h2>
-          <p className="mt-1 text-xs text-gray-500">
-            {customer.phone} - {customer.age} tahun - {getAgeCategoryLabel(customer.ageCategory)}
-          </p>
+    <section className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+      <div className="p-3 sm:p-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="flex min-w-0 items-start gap-3">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-rose-600 text-sm font-black text-white">
+              {initials}
+            </div>
+            <div className="min-w-0">
+              <p className="text-[11px] font-black uppercase tracking-wide text-gray-500">Customer Aktif</p>
+              <h2 className="mt-1 truncate text-base font-black text-gray-900">{customer.name}</h2>
+              <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
+                <span className="font-semibold">{customer.phone}</span>
+                <span>{customer.age} tahun</span>
+                <span className="inline-flex items-center rounded-full border border-violet-200 bg-violet-50 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-violet-700">
+                  {getAgeCategoryLabel(customer.ageCategory)}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={onChangeCustomer}
+            className="min-h-10 rounded-lg border border-gray-300 bg-white px-4 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50"
+          >
+            Ganti Customer
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={onChangeCustomer}
-          className="min-h-9 rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50"
-        >
-          Ganti Customer
-        </button>
+
+        <div className="mt-3 grid gap-2 text-xs md:grid-cols-2">
+          <div className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2">
+            <p className="text-[11px] font-black uppercase tracking-wide text-rose-700">Alergi Aktif</p>
+            <div className="mt-1 flex flex-wrap gap-1.5">
+              {customer.allergies.length ? (
+                customer.allergies.slice(0, 3).map((allergy) => (
+                  <span
+                    key={allergy}
+                    className="inline-flex items-center rounded-full border border-rose-200 bg-white/70 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-rose-700"
+                  >
+                    Alergi: {allergy}
+                  </span>
+                ))
+              ) : (
+                <span className="inline-flex items-center rounded-full border border-gray-200 bg-white/70 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-gray-600">
+                  Tidak ada
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2">
+            <p className="text-[11px] font-black uppercase tracking-wide text-emerald-700">Kondisi Medis</p>
+            <div className="mt-1 flex flex-wrap gap-1.5">
+              {customer.conditions.length ? (
+                customer.conditions.slice(0, 3).map((condition) => (
+                  <span
+                    key={condition}
+                    className="inline-flex items-center rounded-full border border-emerald-200 bg-white/70 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-emerald-700"
+                  >
+                    Kondisi: {getConditionLabel(condition)}
+                  </span>
+                ))
+              ) : (
+                <span className="inline-flex items-center rounded-full border border-emerald-200 bg-white/70 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-emerald-700">
+                  Kondisi: Tidak ada
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
-      <div className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
-        <p className="rounded-lg bg-rose-50 px-3 py-2 font-semibold text-rose-800">
-          Alergi: {customer.allergies.length ? customer.allergies.join(', ') : 'Tidak ada'}
-        </p>
-        <p className="rounded-lg bg-amber-50 px-3 py-2 font-semibold text-amber-800">
-          Kondisi: {customer.conditions.length ? customer.conditions.map(getConditionLabel).join(', ') : 'Tidak ada'}
+
+      <div className="border-t border-gray-100 bg-gray-50 px-3 py-2 text-xs text-gray-600 sm:px-4">
+        <p>
+          {customer.ageCategory === 'child'
+            ? 'Pasien anak. Sistem akan menandai obat berisiko sebelum ditambahkan.'
+            : 'Pastikan konfirmasi alergi dan kondisi medis sebelum memilih obat.'}
         </p>
       </div>
     </section>
@@ -1096,7 +1156,7 @@ export default function StaffLocator({ onBack }) {
   };
 
   const renderCustomerStep = () => (
-    <section className="grid gap-4 px-3 sm:px-0 lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.45fr)]">
+    <section className="px-3 sm:px-0">
       <CustomerPanel
         customers={customers}
         activeCustomerId={activeCustomerId}
@@ -1107,26 +1167,6 @@ export default function StaffLocator({ onBack }) {
         onCreateCustomer={handleCreateCustomer}
         onContinue={handleCustomerContinue}
       />
-
-      <aside className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-        <p className="text-[11px] font-black uppercase tracking-wide text-gray-500">Ringkasan Cabang</p>
-        <div className="mt-3 rounded-lg border border-gray-100 bg-gray-50 p-3">
-          <p className="text-sm font-black text-gray-900">{activeBranch?.name ?? activeBranchId}</p>
-          <p className="mt-1 text-xs font-semibold text-gray-600">{activeBranch?.id ?? activeBranchId}</p>
-          <p className="mt-1 text-xs text-gray-500">
-            {[activeBranch?.address, activeBranch?.city].filter(Boolean).join(', ')}
-          </p>
-        </div>
-        {activeCustomer ? (
-          <div className="mt-4 rounded-lg border border-emerald-100 bg-emerald-50 p-3">
-            <p className="text-xs font-black uppercase tracking-wide text-emerald-700">Customer Dipilih</p>
-            <p className="mt-1 font-bold text-gray-900">{activeCustomer.name}</p>
-            <p className="mt-1 text-xs text-gray-600">
-              {activeCustomer.age} tahun - {getAgeCategoryLabel(activeCustomer.ageCategory)}
-            </p>
-          </div>
-        ) : null}
-      </aside>
     </section>
   );
 
@@ -1246,18 +1286,36 @@ export default function StaffLocator({ onBack }) {
       <AdvancedStockTable rows={filteredRows} selectedMedicineIds={selectedMedicineIds} onSelect={handleSelectMedicine} />
 
       <section className="sticky bottom-0 z-10 -mx-3 min-w-0 border-t border-gray-200 bg-white/95 p-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur sm:mx-0 sm:rounded-lg sm:border sm:pb-3 sm:shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
-          <div className="min-w-0 flex-1">
-            <p className="text-[11px] font-black uppercase tracking-wide text-gray-500">Tahap berikutnya</p>
-            <p className="mt-0.5 truncate text-xs font-bold leading-5 text-gray-900 sm:text-sm">
-              {selectedItems.length ? `Cek keamanan ${selectedItems.length} obat` : 'Pilih minimal satu obat'}
-            </p>
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+          <div className="grid gap-2 sm:grid-cols-3">
+            <div className="rounded-lg border border-gray-200 bg-white px-3 py-2">
+              <p className="text-[11px] font-black uppercase tracking-wide text-gray-500">Obat dipilih</p>
+              <p className="mt-0.5 text-sm font-black text-gray-900">{selectedItems.length}</p>
+              <p className="mt-0.5 text-[11px] text-gray-500">Lihat daftar</p>
+            </div>
+            <div className="rounded-lg border border-gray-200 bg-white px-3 py-2">
+              <p className="text-[11px] font-black uppercase tracking-wide text-gray-500">Total estimasi</p>
+              <p className="mt-0.5 text-sm font-black text-gray-900">
+                {formatRupiah(selectedItems.reduce((sum, item) => sum + (item?.price ?? 0), 0))}
+              </p>
+              <p className="mt-0.5 text-[11px] text-gray-500">Rp 0 jika belum pilih</p>
+            </div>
+            <div className="rounded-lg border border-gray-200 bg-white px-3 py-2">
+              <p className="text-[11px] font-black uppercase tracking-wide text-gray-500">Status keamanan</p>
+              <p className="mt-0.5 text-sm font-black text-gray-900">
+                {safetyWasReviewed ? 'Sudah dicek' : 'Belum dicek'}
+              </p>
+              <p className="mt-0.5 text-[11px] text-gray-500">
+                {selectedItems.length ? 'Pilih minimal satu obat untuk melanjutkan.' : 'Pilih obat untuk memulai.'}
+              </p>
+            </div>
           </div>
+
           <button
             type="button"
             onClick={handleCheckSafety}
             disabled={!selectedItems.length}
-            className="min-h-11 shrink-0 whitespace-nowrap rounded-lg bg-gray-900 px-4 py-2 text-sm font-bold text-white hover:bg-black disabled:cursor-not-allowed disabled:bg-gray-300"
+            className="min-h-11 w-full shrink-0 whitespace-nowrap rounded-lg bg-gray-900 px-5 py-3 text-sm font-black text-white hover:bg-black disabled:cursor-not-allowed disabled:bg-gray-300 lg:w-auto"
           >
             Cek Keamanan Obat
           </button>
@@ -1744,38 +1802,58 @@ export default function StaffLocator({ onBack }) {
     <div className="min-h-screen overflow-x-hidden bg-slate-50 pb-8">
       <header className="sticky top-0 z-20 border-b border-gray-200 bg-white/95 shadow-sm backdrop-blur">
         <div className="w-full px-3 py-2.5 sm:mx-auto sm:max-w-6xl sm:px-4">
-          <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex flex-wrap items-center gap-3">
             <button
               type="button"
               onClick={onBack}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 shadow-sm hover:bg-gray-50"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 shadow-sm hover:bg-gray-50"
               aria-label="Kembali"
             >
               <BackIcon />
             </button>
 
-            <div className="flex min-w-0 flex-1 items-center gap-2">
-              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-rose-600 text-white">
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14M5 12h14" />
-                </svg>
+            <div className="flex min-w-0 flex-1 items-center gap-3">
+              <div className="flex min-w-0 items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-600 text-white shadow-sm">
+                  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m8.5 8.5 7 7" />
+                  </svg>
+                </div>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-black leading-tight text-gray-900">RakObat</p>
+                  <p className="truncate text-[11px] text-gray-400">PharmaLocate</p>
+                </div>
               </div>
+
+              <div className="hidden h-10 w-px bg-gray-200 sm:block" />
+
               <div className="min-w-0">
                 <div className="flex min-w-0 items-center gap-2">
-                  <h1 className="min-w-0 truncate text-sm font-black leading-tight text-gray-900 min-[390px]:text-[15px]">
-                    Panel Staff
-                  </h1>
-                  <span className="shrink-0 rounded-full border border-rose-200 bg-rose-50 px-2 py-0.5 text-[9px] font-black uppercase leading-none text-rose-700 md:text-[10px]">
-                    Pelayanan
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-rose-600">
+                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m8.5 8.5 7 7" />
+                    </svg>
                   </span>
+                  <div className="min-w-0">
+                    <div className="flex min-w-0 items-center gap-2">
+                      <h1 className="min-w-0 truncate text-sm font-black leading-tight text-gray-900 min-[390px]:text-[15px]">
+                        Panel Staff
+                      </h1>
+                      <span className="shrink-0 rounded-full border border-rose-200 bg-rose-50 px-2 py-0.5 text-[9px] font-black uppercase leading-none text-rose-700 md:text-[10px]">
+                        Pelayanan
+                      </span>
+                    </div>
+                    <p className="mt-0.5 hidden truncate text-[11px] text-gray-500 sm:block">
+                      Customer · Obat · Safety · Picking
+                    </p>
+                  </div>
                 </div>
-                <p className="mt-0.5 hidden truncate text-[11px] text-gray-500 sm:block">
-                  Customer · Obat · Safety · Picking
-                </p>
               </div>
             </div>
 
-            <label className="grid w-full shrink-0 gap-1 sm:w-72">
+            <label className="grid w-full shrink-0 gap-1 sm:w-[340px]">
               <span className="text-[10px] font-black uppercase tracking-wide text-gray-500">Cabang</span>
               <select
                 value={activeBranchId}
@@ -1784,7 +1862,7 @@ export default function StaffLocator({ onBack }) {
                   setSafetyReviewedMedicineKey('');
                   resetClosingFlow();
                 }}
-                className="min-h-9 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-xs font-bold text-gray-900 outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
+                className="min-h-11 w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm font-black text-gray-900 outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
               >
                 {branches.map((branch) => (
                   <option key={branch.id} value={branch.id}>

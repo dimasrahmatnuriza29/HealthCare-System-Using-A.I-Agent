@@ -94,10 +94,23 @@ export default function StockManagement({ onBack }) {
   const [changes, setChanges] = useState(initialChanges);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const filter = params.get('filter');
+    // supported: low | out
+    return filter === 'low' ? 'hampir habis' : filter === 'out' ? 'habis' : '';
+  });
 
   const filteredRows = useMemo(() => {
     const normalized = query.trim().toLowerCase();
+    const stockFilter = normalized === 'habis' ? 'out' : normalized === 'hampir habis' ? 'low' : null;
+
+    if (stockFilter === 'out') {
+      return rows.filter((row) => Number(row.current) === 0);
+    }
+    if (stockFilter === 'low') {
+      return rows.filter((row) => Number(row.current) > 0 && Number(row.current) <= Number(row.minimum));
+    }
     if (!normalized) return rows;
     return rows.filter((row) => row.name.toLowerCase().includes(normalized));
   }, [query, rows]);

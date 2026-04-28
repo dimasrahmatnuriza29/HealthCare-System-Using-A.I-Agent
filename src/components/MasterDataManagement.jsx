@@ -56,7 +56,10 @@ export default function MasterDataManagement({ onBack }) {
   const [rows, setRows] = useState(buildInitialRows);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('q') ?? '';
+  });
 
   const filteredRows = useMemo(() => {
     const normalized = query.trim().toLowerCase();
