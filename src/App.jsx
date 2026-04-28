@@ -1,10 +1,19 @@
 import { useEffect, useState } from 'react';
+import MasterDataManagement from './components/MasterDataManagement.jsx';
 import ServiceSelection from './components/ServiceSelection.jsx';
+import ServiceHistoryManagement from './components/ServiceHistoryManagement.jsx';
 import StaffLocator from './components/StaffLocator.jsx';
+import StockManagement from './components/StockManagement.jsx';
+
+const validViews = new Set(['services', 'staff', 'history', 'master', 'stock']);
 
 function getInitialView() {
   const params = new URLSearchParams(window.location.search);
-  if (params.get('view') === 'staff' || window.location.hash === '#staff') {
+  const viewParam = params.get('view');
+  if (validViews.has(viewParam)) {
+    return viewParam;
+  }
+  if (window.location.hash === '#staff') {
     return 'staff';
   }
   return 'services';
@@ -12,8 +21,8 @@ function getInitialView() {
 
 function pushViewToUrl(view) {
   const url = new URL(window.location.href);
-  if (view === 'staff') {
-    url.searchParams.set('view', 'staff');
+  if (view !== 'services') {
+    url.searchParams.set('view', view);
   } else {
     url.searchParams.delete('view');
     url.hash = '';
@@ -39,5 +48,24 @@ export default function App() {
     return <StaffLocator onBack={() => navigate('services')} />;
   }
 
-  return <ServiceSelection onOpenStaff={() => navigate('staff')} />;
+  if (view === 'history') {
+    return <ServiceHistoryManagement onBack={() => navigate('services')} />;
+  }
+
+  if (view === 'master') {
+    return <MasterDataManagement onBack={() => navigate('services')} />;
+  }
+
+  if (view === 'stock') {
+    return <StockManagement onBack={() => navigate('services')} />;
+  }
+
+  return (
+    <ServiceSelection
+      onOpenStaff={() => navigate('staff')}
+      onOpenHistory={() => navigate('history')}
+      onOpenMaster={() => navigate('master')}
+      onOpenStock={() => navigate('stock')}
+    />
+  );
 }
