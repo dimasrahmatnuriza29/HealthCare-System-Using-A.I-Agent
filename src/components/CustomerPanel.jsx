@@ -77,7 +77,7 @@ export default function CustomerPanel({ customers, activeCustomerId, onSelectCus
         <button
           type="button"
           onClick={() => setShowNewCustomer((value) => !value)}
-          className="min-h-10 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-2 text-xs font-bold text-indigo-700 hover:bg-indigo-100"
+          className="min-h-10 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-bold text-rose-700 hover:bg-rose-100"
         >
           Customer Baru
         </button>
@@ -90,7 +90,7 @@ export default function CustomerPanel({ customers, activeCustomerId, onSelectCus
         id="customer-search"
         value={query}
         onChange={(event) => setQuery(event.target.value)}
-        className="mt-2 min-h-11 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm font-medium text-gray-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+        className="mt-2 min-h-11 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm font-medium text-gray-900 outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
         placeholder="Nama atau nomor HP"
       />
 
@@ -104,8 +104,8 @@ export default function CustomerPanel({ customers, activeCustomerId, onSelectCus
               onClick={() => onSelectCustomer(customer.id)}
               className={`min-h-24 rounded-lg border p-3 text-left transition ${
                 active
-                  ? 'border-indigo-300 bg-indigo-50'
-                  : 'border-gray-200 bg-white hover:border-indigo-200 hover:bg-indigo-50/40'
+                  ? 'border-rose-300 bg-rose-50'
+                  : 'border-gray-200 bg-white hover:border-rose-200 hover:bg-rose-50/40'
               }`}
             >
               <div className="flex items-center justify-between gap-3">
@@ -134,7 +134,7 @@ export default function CustomerPanel({ customers, activeCustomerId, onSelectCus
               <input
                 value={form.name}
                 onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
-                className="mt-1 min-h-11 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+                className="mt-1 min-h-11 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
                 placeholder="Contoh: Budi Santoso"
                 required
               />
@@ -144,7 +144,7 @@ export default function CustomerPanel({ customers, activeCustomerId, onSelectCus
               <input
                 value={form.phone}
                 onChange={(event) => setForm((current) => ({ ...current, phone: event.target.value }))}
-                className="mt-1 min-h-11 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+                className="mt-1 min-h-11 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
                 placeholder="Contoh: 081234567890"
                 required
               />
@@ -154,7 +154,7 @@ export default function CustomerPanel({ customers, activeCustomerId, onSelectCus
               <input
                 value={form.age}
                 onChange={(event) => setForm((current) => ({ ...current, age: event.target.value }))}
-                className="mt-1 min-h-11 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+                className="mt-1 min-h-11 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
                 placeholder="Contoh: 32"
                 inputMode="numeric"
                 required
@@ -174,7 +174,7 @@ export default function CustomerPanel({ customers, activeCustomerId, onSelectCus
                         : current.conditions,
                   }))
                 }
-                className="mt-1 min-h-11 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+                className="mt-1 min-h-11 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
               >
                 <option value="male">Laki-laki</option>
                 <option value="female">Perempuan</option>
@@ -186,7 +186,7 @@ export default function CustomerPanel({ customers, activeCustomerId, onSelectCus
             <input
               value={form.allergies}
               onChange={(event) => setForm((current) => ({ ...current, allergies: event.target.value }))}
-              className="mt-1 min-h-11 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+              className="mt-1 min-h-11 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
               placeholder={`Pisahkan dengan koma, contoh: ${commonAllergies.slice(0, 3).join(', ')}`}
             />
           </label>
@@ -199,7 +199,7 @@ export default function CustomerPanel({ customers, activeCustomerId, onSelectCus
                     type="checkbox"
                     checked={form.conditions.includes(condition.key)}
                     onChange={() => toggleCondition(condition.key)}
-                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    className="h-4 w-4 rounded border-gray-300 text-rose-600 focus:ring-rose-500"
                   />
                   {condition.label}
                 </label>
@@ -211,11 +211,11 @@ export default function CustomerPanel({ customers, activeCustomerId, onSelectCus
             <textarea
               value={form.note}
               onChange={(event) => setForm((current) => ({ ...current, note: event.target.value }))}
-              className="mt-1 min-h-20 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+              className="mt-1 min-h-20 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
               placeholder="Contoh: keluhan pelanggan, instruksi apoteker, atau catatan riwayat penting."
             />
           </label>
-          <button type="submit" className="mt-3 w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-indigo-700">
+          <button type="submit" className="mt-3 w-full rounded-lg bg-rose-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-rose-700">
             Simpan & Lanjut Pilih Obat
           </button>
         </form>

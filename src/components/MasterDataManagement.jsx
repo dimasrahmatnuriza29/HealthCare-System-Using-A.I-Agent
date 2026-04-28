@@ -122,13 +122,23 @@ export default function MasterDataManagement({ onBack }) {
   return (
     <div className="min-h-screen bg-slate-50 pb-10">
       <header className="sticky top-0 z-10 border-b border-gray-200 bg-white/95 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center gap-3 px-3 py-3 sm:px-4">
-          <button type="button" onClick={onBack} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50" aria-label="Kembali">
+        <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
+          <button type="button" onClick={onBack} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50" aria-label="Kembali">
             <BackIcon />
           </button>
-          <div>
-            <h1 className="text-base font-black text-gray-900 sm:text-lg">Management Master Rak dan Obat</h1>
-            <p className="text-xs text-gray-500">CRUD daftar obat, mapping rak, batch, expiry, kategori, dan status aktif.</p>
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-slate-700 text-white">
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect width="7" height="7" x="3" y="3" rx="1" />
+                <rect width="7" height="7" x="14" y="3" rx="1" />
+                <rect width="7" height="7" x="3" y="14" rx="1" />
+                <rect width="7" height="7" x="14" y="14" rx="1" />
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-[15px] font-black text-gray-900">Pemetaan Rak</h1>
+              <p className="text-[11px] text-gray-500">Kelola lokasi obat di seluruh rak dan laci.</p>
+            </div>
           </div>
         </div>
       </header>
@@ -137,12 +147,12 @@ export default function MasterDataManagement({ onBack }) {
         <form onSubmit={handleSubmit} className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
           <p className="text-sm font-black text-gray-900">{editingId ? 'Edit Master' : 'Tambah Master'}</p>
           <div className="mt-4 grid gap-3">
-            <input value={form.name} onChange={(event) => updateForm('name', event.target.value)} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" placeholder="Nama obat" required />
+            <input value={form.name} onChange={(event) => updateForm('name', event.target.value)} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500" placeholder="Nama obat" required />
             <div className="grid gap-3 sm:grid-cols-2">
-              <input value={form.dose} onChange={(event) => updateForm('dose', event.target.value)} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" placeholder="Dosis" />
-              <input value={form.form} onChange={(event) => updateForm('form', event.target.value)} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" placeholder="Bentuk" />
+              <input value={form.dose} onChange={(event) => updateForm('dose', event.target.value)} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500" placeholder="Dosis" />
+              <input value={form.form} onChange={(event) => updateForm('form', event.target.value)} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500" placeholder="Bentuk" />
             </div>
-            <select value={form.category} onChange={(event) => updateForm('category', event.target.value)} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500">
+            <select value={form.category} onChange={(event) => updateForm('category', event.target.value)} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500">
               <option>Analgesik</option>
               <option>Antibiotik</option>
               <option>Lambung</option>
@@ -150,14 +160,14 @@ export default function MasterDataManagement({ onBack }) {
               <option>Vitamin</option>
             </select>
             <div className="grid grid-cols-3 gap-3">
-              <input value={form.storage} onChange={(event) => updateForm('storage', event.target.value.toUpperCase())} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" placeholder="Storage" required />
-              <input value={form.kolom} onChange={(event) => updateForm('kolom', event.target.value)} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" placeholder="Kolom" required />
-              <input value={form.rak} onChange={(event) => updateForm('rak', event.target.value)} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" placeholder="Rak" required />
+              <input value={form.storage} onChange={(event) => updateForm('storage', event.target.value.toUpperCase())} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500" placeholder="Storage" required />
+              <input value={form.kolom} onChange={(event) => updateForm('kolom', event.target.value)} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500" placeholder="Kolom" required />
+              <input value={form.rak} onChange={(event) => updateForm('rak', event.target.value)} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500" placeholder="Rak" required />
             </div>
-            <input value={form.batch} onChange={(event) => updateForm('batch', event.target.value)} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" placeholder="Batch" />
-            <input type="date" value={form.expiry} onChange={(event) => updateForm('expiry', event.target.value)} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
+            <input value={form.batch} onChange={(event) => updateForm('batch', event.target.value)} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500" placeholder="Batch" />
+            <input type="date" value={form.expiry} onChange={(event) => updateForm('expiry', event.target.value)} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500" />
             <label className="flex min-h-10 items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 text-sm font-semibold text-gray-700">
-              <input type="checkbox" checked={form.active} onChange={(event) => updateForm('active', event.target.checked)} className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+              <input type="checkbox" checked={form.active} onChange={(event) => updateForm('active', event.target.checked)} className="h-4 w-4 rounded border-gray-300 text-rose-600 focus:ring-rose-500" />
               Status aktif
             </label>
           </div>
@@ -176,7 +186,7 @@ export default function MasterDataManagement({ onBack }) {
                 <p className="text-sm font-black text-gray-900">Daftar Master</p>
                 <p className="text-xs text-gray-500">{filteredRows.length} item ditemukan</p>
               </div>
-              <input value={query} onChange={(event) => setQuery(event.target.value)} className="min-h-10 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 sm:w-72" placeholder="Cari master..." />
+              <input value={query} onChange={(event) => setQuery(event.target.value)} className="min-h-10 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500 sm:w-72" placeholder="Cari master..." />
             </div>
           </div>
           <div className="scroll-fade overflow-x-auto">

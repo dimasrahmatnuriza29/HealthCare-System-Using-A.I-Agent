@@ -66,9 +66,9 @@ textarea {
 @keyframes location-pulse {
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.28);
+    box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.22);
   }
   50% {
-    box-shadow: 0 0 0 8px rgba(79, 70, 229, 0);
+    box-shadow: 0 0 0 8px rgba(225, 29, 72, 0);
   }
 }

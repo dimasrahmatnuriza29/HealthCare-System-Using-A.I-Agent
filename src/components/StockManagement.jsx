@@ -181,13 +181,21 @@ export default function StockManagement({ onBack }) {
   return (
     <div className="min-h-screen bg-slate-50 pb-10">
       <header className="sticky top-0 z-10 border-b border-gray-200 bg-white/95 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center gap-3 px-3 py-3 sm:px-4">
-          <button type="button" onClick={onBack} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50" aria-label="Kembali">
+        <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
+          <button type="button" onClick={onBack} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50" aria-label="Kembali">
             <BackIcon />
           </button>
-          <div>
-            <h1 className="text-base font-black text-gray-900 sm:text-lg">Management Stok Obat</h1>
-            <p className="text-xs text-gray-500">CRUD stok, stok minimum, indikator hampir habis, dan riwayat perubahan.</p>
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-amber-600 text-white">
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m3 7 9-4 9 4-9 4-9-4Z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10l9 4 9-4V7M12 11v10" />
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-[15px] font-black text-gray-900">Stok Obat</h1>
+              <p className="text-[11px] text-gray-500">Pantau stok, kedaluwarsa, dan kebutuhan restock.</p>
+            </div>
           </div>
         </div>
       </header>
@@ -197,14 +205,14 @@ export default function StockManagement({ onBack }) {
           <form onSubmit={handleSubmit} className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
             <p className="text-sm font-black text-gray-900">{editingId ? 'Edit Stok' : 'Tambah Stok'}</p>
             <div className="mt-4 grid gap-3">
-              <input value={form.name} onChange={(event) => updateForm('name', event.target.value)} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" placeholder="Nama obat" required />
+              <input value={form.name} onChange={(event) => updateForm('name', event.target.value)} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500" placeholder="Nama obat" required />
               <div className="grid gap-3 sm:grid-cols-2">
-                <input type="number" value={form.current} onChange={(event) => updateForm('current', event.target.value)} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" placeholder="Stok saat ini" />
-                <input type="number" value={form.minimum} onChange={(event) => updateForm('minimum', event.target.value)} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" placeholder="Stok minimum" />
+                <input type="number" value={form.current} onChange={(event) => updateForm('current', event.target.value)} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500" placeholder="Stok saat ini" />
+                <input type="number" value={form.minimum} onChange={(event) => updateForm('minimum', event.target.value)} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500" placeholder="Stok minimum" />
               </div>
-              <input type="number" value={form.price} onChange={(event) => updateForm('price', event.target.value)} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" placeholder="Harga" />
-              <input value={form.reason} onChange={(event) => updateForm('reason', event.target.value)} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" placeholder="Alasan perubahan" />
-              <input value={form.staff} onChange={(event) => updateForm('staff', event.target.value)} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" placeholder="Staff" />
+              <input type="number" value={form.price} onChange={(event) => updateForm('price', event.target.value)} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500" placeholder="Harga" />
+              <input value={form.reason} onChange={(event) => updateForm('reason', event.target.value)} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500" placeholder="Alasan perubahan" />
+              <input value={form.staff} onChange={(event) => updateForm('staff', event.target.value)} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500" placeholder="Staff" />
             </div>
             <div className="mt-4 flex gap-2">
               <button type="submit" className="min-h-10 flex-1 rounded-lg bg-gray-900 px-4 py-2 text-sm font-bold text-white hover:bg-black">
@@ -242,7 +250,7 @@ export default function StockManagement({ onBack }) {
                 <p className="text-sm font-black text-gray-900">Daftar Stok</p>
                 <p className="text-xs text-gray-500">{filteredRows.length} item ditemukan</p>
               </div>
-              <input value={query} onChange={(event) => setQuery(event.target.value)} className="min-h-10 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 sm:w-72" placeholder="Cari stok..." />
+              <input value={query} onChange={(event) => setQuery(event.target.value)} className="min-h-10 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500 sm:w-72" placeholder="Cari stok..." />
             </div>
           </div>
           <div className="scroll-fade overflow-x-auto">

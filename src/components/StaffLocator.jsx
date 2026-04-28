@@ -366,7 +366,7 @@ function MedicineCard({ item, customer, selected, onSelect }) {
   return (
     <article
       className={`min-w-0 overflow-hidden rounded-lg border bg-white p-3 shadow-sm transition ${
-        selected ? 'border-gray-900 ring-2 ring-gray-200' : 'border-gray-200 hover:border-gray-300'
+        selected ? 'border-rose-400 ring-2 ring-rose-100' : 'border-gray-200 hover:border-gray-300'
       }`}
     >
       <div className="flex min-w-0 items-start justify-between gap-3">
@@ -404,7 +404,7 @@ function MedicineCard({ item, customer, selected, onSelect }) {
         type="button"
         onClick={() => onSelect(item.id)}
         className={`mt-3 min-h-10 w-full rounded-lg px-3 py-2 text-sm font-bold ${
-          selected ? 'bg-gray-900 text-white hover:bg-black' : 'bg-indigo-600 text-white hover:bg-indigo-700'
+          selected ? 'bg-gray-900 text-white hover:bg-black' : 'bg-rose-600 text-white hover:bg-rose-700'
         }`}
       >
         {selected ? 'Hapus dari Pilihan' : 'Tambah Obat'}
@@ -434,7 +434,7 @@ function AdvancedStockTable({ rows, selectedMedicineIds, onSelect }) {
             {rows.map((item) => {
               const selected = selectedMedicineIds.includes(item.id);
               return (
-              <tr key={`advanced-${item.id}`} className={selected ? 'bg-indigo-50' : ''}>
+              <tr key={`advanced-${item.id}`} className={selected ? 'bg-rose-50' : ''}>
                 <td className="px-4 py-3">
                   <p className="font-bold text-gray-900">{item.medicine.name}</p>
                   <p className="mt-0.5 text-xs text-gray-500">{item.medicine.indications.join(', ')}</p>
@@ -450,7 +450,7 @@ function AdvancedStockTable({ rows, selectedMedicineIds, onSelect }) {
                   <button
                     type="button"
                     onClick={() => onSelect(item.id)}
-                    className="inline-flex items-center rounded-lg bg-indigo-600 px-3 py-2 text-xs font-bold text-white hover:bg-indigo-700"
+                    className="inline-flex items-center rounded-lg bg-rose-600 px-3 py-2 text-xs font-bold text-white hover:bg-rose-700"
                   >
                     {selected ? 'Hapus' : 'Tambah'}
                   </button>
@@ -1019,7 +1019,7 @@ export default function StaffLocator({ onBack }) {
             <input
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
-              className="min-h-10 w-full min-w-0 max-w-full rounded-lg border border-gray-300 bg-gray-50 py-2 pl-10 pr-10 text-sm font-semibold text-gray-900 outline-none placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+              className="min-h-10 w-full min-w-0 max-w-full rounded-lg border border-gray-300 bg-gray-50 py-2 pl-10 pr-10 text-sm font-semibold text-gray-900 outline-none placeholder:text-gray-400 focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
               placeholder="Cari obat, kategori, atau indikasi..."
             />
             {searchQuery ? (
@@ -1041,7 +1041,7 @@ export default function StaffLocator({ onBack }) {
                 const [key, direction] = event.target.value.split(':');
                 setSortConfig({ key, direction });
               }}
-              className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-xs font-bold text-gray-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+              className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-xs font-bold text-gray-900 outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
             >
               <option value="name:asc">Nama A-Z</option>
               <option value="name:desc">Nama Z-A</option>
@@ -1069,7 +1069,7 @@ export default function StaffLocator({ onBack }) {
                 className={`min-h-8 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-bold transition ${
                   active
                     ? 'border-gray-900 bg-gray-900 text-white'
-                    : 'border-gray-300 bg-white text-gray-700 hover:border-indigo-300 hover:text-indigo-700'
+                    : 'border-gray-300 bg-white text-gray-700 hover:border-rose-300 hover:text-rose-700'
                 }`}
               >
                 {category}
@@ -1088,7 +1088,7 @@ export default function StaffLocator({ onBack }) {
             </p>
           </div>
           {selectedItems.length ? (
-            <span className="rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-700">
+            <span className="rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-xs font-bold text-rose-700">
               {selectedItems.length} obat dipilih
             </span>
           ) : null}
@@ -1273,26 +1273,26 @@ export default function StaffLocator({ onBack }) {
         {decision.showLocation ? <ClosingWorkflowProgress currentStep={closingStep} /> : null}
 
         {decision.showLocation && closingStep === 'picking' ? (
-          <section className="location-card-pulse overflow-hidden rounded-lg border border-indigo-300 bg-indigo-50 p-4 shadow-sm">
+          <section className="location-card-pulse overflow-hidden rounded-lg border border-rose-300 bg-rose-50 p-4 shadow-sm">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wide text-indigo-700">
+                <p className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wide text-rose-700">
                   <LocationPinIcon />
                   Lokasi Picking
                 </p>
                 <h3 className="mt-1 break-words text-xl font-black leading-tight text-gray-900">{selectedItems.length} obat siap diambil</h3>
-                <p className="mt-1 text-xs font-semibold text-indigo-700">Ambil semua obat sesuai lokasi masing-masing</p>
+                <p className="mt-1 text-xs font-semibold text-rose-700">Ambil semua obat sesuai lokasi masing-masing</p>
               </div>
               <span className="rounded-full border border-emerald-200 bg-white px-2.5 py-1 text-xs font-black text-emerald-700">Siap Picking</span>
             </div>
 
             <div className="mt-4 grid gap-3 lg:grid-cols-2">
               {selectedItems.map((item) => (
-                <article key={`pick-${item.id}`} className="rounded-lg border border-indigo-200 bg-white p-3">
+                <article key={`pick-${item.id}`} className="rounded-lg border border-rose-200 bg-white p-3">
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div>
                       <h4 className="text-sm font-black text-gray-900">{item.medicine.name}</h4>
-                      <p className="mt-1 text-xs font-semibold text-indigo-700">Zona {item.zone}</p>
+                      <p className="mt-1 text-xs font-semibold text-rose-700">Zona {item.zone}</p>
                     </div>
                     <span className={`rounded-full border px-2 py-0.5 text-[10px] font-black ${item.status.badgeClass}`}>{item.status.label}</span>
                   </div>
@@ -1302,9 +1302,9 @@ export default function StaffLocator({ onBack }) {
                       ['Kolom', item.kolom],
                       ['Rak', item.rak],
                     ].map(([label, value]) => (
-                      <div key={`${item.id}-${label}`} className="rounded-lg border border-indigo-100 bg-indigo-50 p-2 text-center">
-                        <p className="text-[10px] font-bold uppercase tracking-wider text-indigo-600">{label}</p>
-                        <p className="mt-1 text-2xl font-black leading-none text-indigo-700">{value}</p>
+                      <div key={`${item.id}-${label}`} className="rounded-lg border border-rose-100 bg-rose-50 p-2 text-center">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-rose-600">{label}</p>
+                        <p className="mt-1 text-2xl font-black leading-none text-rose-700">{value}</p>
                       </div>
                     ))}
                   </div>
@@ -1396,7 +1396,7 @@ export default function StaffLocator({ onBack }) {
                     <input
                       value={servedBy}
                       onChange={(event) => setServedBy(event.target.value)}
-                      className="mt-1 min-h-10 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+                      className="mt-1 min-h-10 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
                     />
                   </label>
                   <label className="block">
@@ -1404,7 +1404,7 @@ export default function StaffLocator({ onBack }) {
                     <select
                       value={serviceStatus === 'dispensed' ? 'consultation' : serviceStatus}
                       onChange={(event) => setServiceStatus(event.target.value)}
-                      className="mt-1 min-h-10 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+                      className="mt-1 min-h-10 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
                     >
                       <option value="consultation">Perlu konsultasi</option>
                       <option value="cancelled">Batal</option>
@@ -1414,7 +1414,7 @@ export default function StaffLocator({ onBack }) {
                 <textarea
                   value={staffNote}
                   onChange={(event) => setStaffNote(event.target.value)}
-                  className="mt-3 min-h-24 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+                  className="mt-3 min-h-24 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
                   placeholder="Tambahkan catatan konsultasi, alasan batal, atau instruksi apoteker."
                 />
                 <div className="mt-3 flex flex-wrap justify-end gap-2">
@@ -1483,7 +1483,7 @@ export default function StaffLocator({ onBack }) {
                   <input
                     value={servedBy}
                     onChange={(event) => setServedBy(event.target.value)}
-                    className="mt-1 min-h-10 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+                    className="mt-1 min-h-10 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
                   />
                 </label>
                 <label className="block">
@@ -1491,7 +1491,7 @@ export default function StaffLocator({ onBack }) {
                   <select
                     value={serviceStatus}
                     onChange={(event) => setServiceStatus(event.target.value)}
-                    className="mt-1 min-h-10 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+                    className="mt-1 min-h-10 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
                   >
                     <option value="dispensed">Diserahkan</option>
                     <option value="consultation">Perlu konsultasi</option>
@@ -1503,7 +1503,7 @@ export default function StaffLocator({ onBack }) {
                   <textarea
                     value={staffNote}
                     onChange={(event) => setStaffNote(event.target.value)}
-                    className="mt-1 min-h-28 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+                    className="mt-1 min-h-28 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
                     placeholder="Tambahkan catatan untuk customer record, misalnya keluhan pelanggan, edukasi khusus, atau instruksi apoteker."
                   />
                 </label>
@@ -1613,7 +1613,7 @@ export default function StaffLocator({ onBack }) {
   return (
     <div className="min-h-screen overflow-x-hidden bg-slate-50 pb-8">
       <header className="sticky top-0 z-20 border-b border-gray-200 bg-white/95 shadow-sm backdrop-blur">
-        <div className="w-full px-3 py-2 sm:mx-auto sm:max-w-6xl sm:px-4">
+        <div className="w-full px-3 py-2.5 sm:mx-auto sm:max-w-6xl sm:px-4">
           <div className="flex flex-wrap items-center gap-2.5">
             <button
               type="button"
@@ -1624,22 +1624,29 @@ export default function StaffLocator({ onBack }) {
               <BackIcon />
             </button>
 
-            <div className="min-w-0 flex-1">
-              <div className="flex min-w-0 items-center gap-2">
-                <h1 className="min-w-0 truncate text-sm font-black leading-tight text-gray-900 min-[390px]:text-[15px] sm:text-base">
-                  Staff Panel: Alur Pelayanan Obat
-                </h1>
-                <span className="shrink-0 rounded-full border border-indigo-200 bg-indigo-50 px-2 py-0.5 text-[9px] font-black uppercase leading-none text-indigo-700 md:text-[10px]">
-                  Mode Staff
-                </span>
+            <div className="flex min-w-0 flex-1 items-center gap-2">
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-rose-600 text-white">
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14M5 12h14" />
+                </svg>
               </div>
-              <p className="mt-0.5 hidden truncate text-[11px] text-gray-500 sm:block">
-                Customer context, inventory, safety check, dan lokasi picking.
-              </p>
+              <div className="min-w-0">
+                <div className="flex min-w-0 items-center gap-2">
+                  <h1 className="min-w-0 truncate text-sm font-black leading-tight text-gray-900 min-[390px]:text-[15px]">
+                    Panel Staff
+                  </h1>
+                  <span className="shrink-0 rounded-full border border-rose-200 bg-rose-50 px-2 py-0.5 text-[9px] font-black uppercase leading-none text-rose-700 md:text-[10px]">
+                    Pelayanan
+                  </span>
+                </div>
+                <p className="mt-0.5 hidden truncate text-[11px] text-gray-500 sm:block">
+                  Customer · Obat · Safety · Picking
+                </p>
+              </div>
             </div>
 
             <label className="grid w-full shrink-0 gap-1 sm:w-72">
-              <span className="text-[10px] font-black uppercase tracking-wide text-gray-500">Pilih Cabang</span>
+              <span className="text-[10px] font-black uppercase tracking-wide text-gray-500">Cabang</span>
               <select
                 value={activeBranchId}
                 onChange={(event) => {
@@ -1647,7 +1654,7 @@ export default function StaffLocator({ onBack }) {
                   setSafetyReviewedMedicineKey('');
                   resetClosingFlow();
                 }}
-                className="min-h-9 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-xs font-bold text-gray-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+                className="min-h-9 w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-xs font-bold text-gray-900 outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500"
               >
                 {branches.map((branch) => (
                   <option key={branch.id} value={branch.id}>
