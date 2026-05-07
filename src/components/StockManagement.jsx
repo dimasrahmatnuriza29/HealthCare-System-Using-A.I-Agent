@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
 import { branchStock, getPriceForMedicine } from '../data/branches.js';
 import { medicines } from '../data/medicines.js';
+import useLocalStorage from '../hooks/useLocalStorage.js';
+import { BackIcon, PackageIcon } from './ui/Icons.jsx';
 
 const branchId = 'JKT001';
 
@@ -63,14 +65,6 @@ const initialChanges = [
   },
 ];
 
-function BackIcon() {
-  return (
-    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-      <path strokeLinecap="round" strokeLinejoin="round" d="m15 19-7-7 7-7" />
-    </svg>
-  );
-}
-
 function formatRupiah(value) {
   return new Intl.NumberFormat('id-ID', {
     style: 'currency',
@@ -89,9 +83,15 @@ function getStockStatus(row) {
   return { label: 'Aman', className: 'border-emerald-200 bg-emerald-50 text-emerald-700' };
 }
 
+/**
+ * Manages persisted stock rows and stock-change history for the active branch.
+ *
+ * @param {{ onBack: () => void }} props - Component props.
+ * @returns {import('react').ReactElement} Stock management UI.
+ */
 export default function StockManagement({ onBack }) {
-  const [rows, setRows] = useState(buildInitialRows);
-  const [changes, setChanges] = useState(initialChanges);
+  const [rows, setRows] = useLocalStorage('rakobat.stockRows.v1', buildInitialRows);
+  const [changes, setChanges] = useLocalStorage('rakobat.stockChanges.v1', initialChanges);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [query, setQuery] = useState(() => {
@@ -200,10 +200,7 @@ export default function StockManagement({ onBack }) {
           </button>
           <div className="flex items-center gap-2.5">
             <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-amber-600 text-white">
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="m3 7 9-4 9 4-9 4-9-4Z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10l9 4 9-4V7M12 11v10" />
-              </svg>
+              <PackageIcon className="h-4 w-4" />
             </div>
             <div>
               <h1 className="text-[15px] font-black text-gray-900">Stok Obat</h1>

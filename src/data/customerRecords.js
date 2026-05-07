@@ -106,6 +106,12 @@ export const customerRecords = [
   },
 ];
 
+/**
+ * Maps a numeric age to the app's dispensing age category.
+ *
+ * @param {number} age - Customer age in years.
+ * @returns {'infant' | 'child' | 'teen' | 'adult'} Age category key.
+ */
 export function getAgeCategory(age) {
   if (age < 2) return 'infant';
   if (age <= 11) return 'child';
@@ -113,6 +119,12 @@ export function getAgeCategory(age) {
   return 'adult';
 }
 
+/**
+ * Gets the display label for an age category key.
+ *
+ * @param {string} ageCategory - Age category key.
+ * @returns {string} Uppercase display label.
+ */
 export function getAgeCategoryLabel(ageCategory) {
   const labels = {
     infant: 'BAYI',
@@ -123,15 +135,35 @@ export function getAgeCategoryLabel(ageCategory) {
   return labels[ageCategory] ?? 'DEWASA';
 }
 
+/**
+ * Gets the display label for a special medical condition key.
+ *
+ * @param {string} conditionKey - Condition key stored on the customer record.
+ * @returns {string} Human-readable condition label.
+ */
 export function getConditionLabel(conditionKey) {
   return specialConditionOptions.find((condition) => condition.key === conditionKey)?.label ?? conditionKey;
 }
 
+/**
+ * Finds a customer by normalized phone number.
+ *
+ * @param {string} phone - Phone number to find.
+ * @param {Array<object>} [records=customerRecords] - Customer records to search.
+ * @returns {object | null} Matching customer record, or null when not found.
+ */
 export function getCustomerByPhone(phone, records = customerRecords) {
   const normalizedPhone = phone.replace(/\D/g, '');
   return records.find((customer) => customer.phone.replace(/\D/g, '') === normalizedPhone) ?? null;
 }
 
+/**
+ * Searches customers by name, phone, age category, allergy, or condition label.
+ *
+ * @param {string} query - Free-text search query.
+ * @param {Array<object>} [records=customerRecords] - Customer records to search.
+ * @returns {Array<object>} Matching customer records.
+ */
 export function searchCustomers(query, records = customerRecords) {
   const normalizedQuery = query.trim().toLowerCase();
   if (!normalizedQuery) return records;
@@ -149,6 +181,12 @@ export function searchCustomers(query, records = customerRecords) {
   });
 }
 
+/**
+ * Builds a new customer record from form input without mutating existing data.
+ *
+ * @param {object} input - New customer form data.
+ * @returns {object} Customer record ready to store in React state.
+ */
 export function createCustomerRecord(input) {
   const now = new Date().toISOString().slice(0, 10);
   const age = Number(input.age) || 0;
@@ -174,37 +212,4 @@ export function createCustomerRecord(input) {
         ]
       : [],
   };
-}
-
-export function addCustomer(customer) {
-  const record = createCustomerRecord(customer);
-  customerRecords.push(record);
-  return record;
-}
-
-export function updateCustomer(customerId, patch) {
-  const index = customerRecords.findIndex((customer) => customer.id === customerId);
-  if (index === -1) return null;
-  customerRecords[index] = {
-    ...customerRecords[index],
-    ...patch,
-    updatedAt: new Date().toISOString().slice(0, 10),
-  };
-  return customerRecords[index];
-}
-
-export function addMedicineHistory(customerId, historyItem) {
-  const customer = customerRecords.find((record) => record.id === customerId);
-  if (!customer) return null;
-  customer.medicineHistory.unshift(historyItem);
-  customer.updatedAt = new Date().toISOString().slice(0, 10);
-  return customer;
-}
-
-export function addNote(customerId, note) {
-  const customer = customerRecords.find((record) => record.id === customerId);
-  if (!customer) return null;
-  customer.notes.unshift(note);
-  customer.updatedAt = new Date().toISOString().slice(0, 10);
-  return customer;
 }

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
-import { medicines } from '../data/medicines.js';
+import { medicineCategories, medicines } from '../data/medicines.js';
 import { getLocationForMedicine } from '../data/storageLocations.js';
+import { BackIcon, GridIcon } from './ui/Icons.jsx';
 
 const branchId = 'JKT001';
 
@@ -36,14 +37,6 @@ function buildInitialRows() {
   });
 }
 
-function BackIcon() {
-  return (
-    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-      <path strokeLinecap="round" strokeLinejoin="round" d="m15 19-7-7 7-7" />
-    </svg>
-  );
-}
-
 function StatusBadge({ active }) {
   return (
     <span className={`rounded-full border px-2.5 py-1 text-xs font-black ${active ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-gray-200 bg-gray-50 text-gray-500'}`}>
@@ -52,6 +45,12 @@ function StatusBadge({ active }) {
   );
 }
 
+/**
+ * Manages medicine master data and rack mapping rows.
+ *
+ * @param {{ onBack: () => void }} props - Component props.
+ * @returns {import('react').ReactElement} Master data management UI.
+ */
 export default function MasterDataManagement({ onBack }) {
   const [rows, setRows] = useState(buildInitialRows);
   const [form, setForm] = useState(emptyForm);
@@ -131,12 +130,7 @@ export default function MasterDataManagement({ onBack }) {
           </button>
           <div className="flex items-center gap-2.5">
             <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-slate-700 text-white">
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect width="7" height="7" x="3" y="3" rx="1" />
-                <rect width="7" height="7" x="14" y="3" rx="1" />
-                <rect width="7" height="7" x="3" y="14" rx="1" />
-                <rect width="7" height="7" x="14" y="14" rx="1" />
-              </svg>
+              <GridIcon className="h-4 w-4" />
             </div>
             <div>
               <h1 className="text-[15px] font-black text-gray-900">Pemetaan Rak</h1>
@@ -156,11 +150,11 @@ export default function MasterDataManagement({ onBack }) {
               <input value={form.form} onChange={(event) => updateForm('form', event.target.value)} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500" placeholder="Bentuk" />
             </div>
             <select value={form.category} onChange={(event) => updateForm('category', event.target.value)} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500">
-              <option>Analgesik</option>
-              <option>Antibiotik</option>
-              <option>Lambung</option>
-              <option>Batuk</option>
-              <option>Vitamin</option>
+              {medicineCategories
+                .filter((category) => category !== 'Semua')
+                .map((category) => (
+                  <option key={category}>{category}</option>
+                ))}
             </select>
             <div className="grid grid-cols-3 gap-3">
               <input value={form.storage} onChange={(event) => updateForm('storage', event.target.value.toUpperCase())} className="min-h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500" placeholder="Storage" required />

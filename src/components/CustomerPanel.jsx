@@ -1,81 +1,22 @@
 import { useMemo, useState } from 'react';
+import { useCustomers } from '../contexts/CustomerContext.jsx';
+import {
+  ArrowRightIcon,
+  CheckCircleIcon,
+  ChevronRightIcon,
+  ClipboardIcon,
+  ClockIcon,
+  PlusIcon,
+  SearchIcon,
+  UserIcon,
+} from './ui/Icons.jsx';
 import {
   commonAllergies,
-  createCustomerRecord,
   getAgeCategoryLabel,
   getConditionLabel,
   searchCustomers,
   specialConditionOptions,
 } from '../data/customerRecords.js';
-
-function SearchIcon({ className = 'h-5 w-5' }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-4.35-4.35M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z" />
-    </svg>
-  );
-}
-
-function ChevronRightIcon({ className = 'h-5 w-5' }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3">
-      <path strokeLinecap="round" strokeLinejoin="round" d="m9 18 6-6-6-6" />
-    </svg>
-  );
-}
-
-function ClockIcon({ className = 'h-4 w-4' }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <circle cx="12" cy="12" r="10" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" />
-    </svg>
-  );
-}
-
-function ClipboardIcon({ className = 'h-4 w-4' }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5h6" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 3h6a2 2 0 0 1 2 2v1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h1V5a2 2 0 0 1 2-2Z" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h8M8 16h5" />
-    </svg>
-  );
-}
-
-function UserIcon({ className = 'h-10 w-10' }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" />
-    </svg>
-  );
-}
-
-function CheckCircleIcon({ className = 'h-5 w-5' }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M22 4 12 14.01l-3-3" />
-    </svg>
-  );
-}
-
-function PlusIcon({ className = 'h-4 w-4' }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14M5 12h14" />
-    </svg>
-  );
-}
-
-function ArrowRightIcon({ className = 'h-4 w-4' }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
-    </svg>
-  );
-}
 
 function Badge({ children, tone = 'gray' }) {
   const toneClass =
@@ -182,7 +123,17 @@ const emptyForm = {
 
 const femaleOnlyConditionKeys = new Set(['hamil_t1', 'hamil_t2', 'hamil_t3', 'menyusui']);
 
-export default function CustomerPanel({ customers, activeCustomerId, onSelectCustomer, onCreateCustomer, onContinue }) {
+/**
+ * Renders customer search, profile summary, and new-customer creation for dispensing workflows.
+ *
+ * @param {object} props - Component props.
+ * @param {string | null} props.activeCustomerId - Currently selected customer ID.
+ * @param {(customerId: string) => void} props.onSelectCustomer - Selection callback.
+ * @param {(customer: object) => void} [props.onContinue] - Workflow continuation callback.
+ * @returns {import('react').ReactElement} Customer panel UI.
+ */
+export default function CustomerPanel({ activeCustomerId, onSelectCustomer, onContinue }) {
+  const { customers, addCustomer } = useCustomers();
   const [query, setQuery] = useState('');
   const [showNewCustomer, setShowNewCustomer] = useState(false);
   const [form, setForm] = useState(emptyForm);
@@ -218,12 +169,12 @@ export default function CustomerPanel({ customers, activeCustomerId, onSelectCus
       .map((item) => item.trim())
       .filter(Boolean);
 
-    const record = createCustomerRecord({
+    const record = addCustomer({
       ...form,
       allergies,
     });
 
-    onCreateCustomer(record);
+    onSelectCustomer?.(record.id);
     setForm(emptyForm);
     setShowNewCustomer(false);
     onContinue?.(record);

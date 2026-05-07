@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react';
+import useLocalStorage from '../hooks/useLocalStorage.js';
+import { BackIcon, ClipboardBaseIcon } from './ui/Icons.jsx';
 
 const emptyForm = {
   customer: '',
@@ -47,14 +49,6 @@ const initialRecords = [
   },
 ];
 
-function BackIcon() {
-  return (
-    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-      <path strokeLinecap="round" strokeLinejoin="round" d="m15 19-7-7 7-7" />
-    </svg>
-  );
-}
-
 function StatusBadge({ status }) {
   const className =
     status === 'Selesai' || status === 'Aman'
@@ -70,8 +64,14 @@ function formatDateTime(value) {
   return new Date(value).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
 }
 
+/**
+ * Manages persisted service history records for completed, cancelled, and consultation services.
+ *
+ * @param {{ onBack: () => void }} props - Component props.
+ * @returns {import('react').ReactElement} Service history management UI.
+ */
 export default function ServiceHistoryManagement({ onBack }) {
-  const [records, setRecords] = useState(initialRecords);
+  const [records, setRecords] = useLocalStorage('rakobat.serviceRecords.v1', initialRecords);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [query, setQuery] = useState('');
@@ -151,9 +151,7 @@ export default function ServiceHistoryManagement({ onBack }) {
           </button>
           <div className="flex items-center gap-2.5">
             <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-emerald-600 text-white">
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5h6M9 3h6a2 2 0 0 1 2 2v1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h1V5a2 2 0 0 1 2-2Z" />
-              </svg>
+              <ClipboardBaseIcon className="h-4 w-4" />
             </div>
             <div>
               <h1 className="text-[15px] font-black text-gray-900">Riwayat Pelayanan</h1>
