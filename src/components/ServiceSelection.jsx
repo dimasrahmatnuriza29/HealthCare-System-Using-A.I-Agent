@@ -1,6 +1,10 @@
-import { branchStock } from '../data/branches.js';
+import { useState } from 'react';
+import { branchStock, medicinePrices } from '../data/branches.js';
+import { branchStockExpanded, findAlternativeBranch } from '../data/branchStockExpanded.js';
+import { storageLocations } from '../data/storageLocations.js';
 import { useCustomers } from '../contexts/CustomerContext.jsx';
 import { medicines } from '../data/medicines.js';
+import { medicinesExpanded } from '../data/medicinesExpanded.js';
 import {
   ActivityIcon,
   AlertTriangleIcon,
@@ -12,6 +16,7 @@ import {
   ChevronDownIcon,
   ChevronRightIcon,
   ClipboardListIcon,
+  CloseIcon,
   CogIcon,
   DatabaseIcon,
   HomeIcon,
@@ -233,6 +238,252 @@ function ActionCard({ title, description, icon, badge, onClick, accent = 'slate'
   );
 }
 
+// ── Stock Alert Modal ─────────────────────────────────────────────────────
+
+function buildStockAlertItems(branchId, mode) {
+  const stockData = branchStock[branchId] ?? {};
+  const expandedData = branchStockExpanded[branchId]?.stock ?? {};
+  const prices = medicinePrices[branchId] ?? {};
+
+  return Object.entries(stockData)
+    .filter(([, qty]) => (mode === 'low' ? qty > 0 && qty <= 20 : qty === 0))
+    .map(([medId, qty]) => {
+      const med = medicinesExpanded.find((m) => m.id === medId);
+      const expanded = expandedData[medId];
+      const altBranches = findAlternativeBranch(branchId, medId);
+      const loc = storageLocations[branchId]?.[medId] ?? null;
+      return {
+        id: medId,
+        name: med?.name ?? medId,
+        brand: med?.brand ?? '-',
+        dose: med?.dose ?? '-',
+        form: med?.form ?? '-',
+        category: med?.category ?? '-',
+        isPrimary: med?.isPrimary ?? false,
+        indications: med?.indications ?? [],
+        stock: qty,
+        minStock: expanded?.min ?? 0,
+        price: prices[medId] ?? expanded?.price ?? 0,
+        altBranches,
+        location: loc,
+      };
+    })
+    .sort((a, b) => a.stock - b.stock);
+}
+
+function formatRupiahSimple(v) {
+  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(v);
+}
+
+function StockAlertModal({ open, mode, onClose }) {
+  const [expandedId, setExpandedId] = useState(null);
+
+  if (!open) return null;
+
+  const isLow = mode === 'low';
+  const items = buildStockAlertItems(activeBranchId, mode);
+  const title = isLow ? 'Stok Menipis' : 'Stok Habis';
+  const subtitle = isLow
+    ? `${items.length} produk dengan stok ≤ 20 pcs — perlu segera restock`
+    : `${items.length} produk dengan stok 0 — tidak tersedia untuk dijual`;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 p-4 pt-[10vh] backdrop-blur-sm" onClick={onClose}>
+      <div
+        className="w-full max-w-lg overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className={`flex items-center justify-between px-5 py-4 ${isLow ? 'bg-amber-50' : 'bg-red-50'}`}>
+          <div className="flex items-center gap-3">
+            <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${isLow ? 'bg-amber-100 text-amber-600' : 'bg-red-100 text-red-600'}`}>
+              {isLow ? <AlertTriangleIcon className="h-5 w-5" /> : <BanIcon className="h-5 w-5" />}
+            </div>
+            <div>
+              <h2 className={`text-base font-black ${isLow ? 'text-amber-900' : 'text-red-900'}`}>{title}</h2>
+              <p className={`text-xs ${isLow ? 'text-amber-700' : 'text-red-700'}`}>{subtitle}</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-white/80"
+          >
+            <CloseIcon className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* Items list */}
+        <div className="max-h-[55vh] overflow-y-auto p-3">
+          {items.length === 0 ? (
+            <div className="py-10 text-center">
+              <p className="text-sm font-bold text-gray-500">
+                {isLow ? 'Tidak ada produk dengan stok menipis.' : 'Tidak ada produk yang habis.'}
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-2">
+              {items.map((item) => {
+                const isExpanded = expandedId === item.id;
+                return (
+                  <div key={item.id} className="overflow-hidden rounded-xl border border-gray-200 bg-white transition hover:border-gray-300">
+                    {/* Summary row */}
+                    <button
+                      type="button"
+                      onClick={() => setExpandedId(isExpanded ? null : item.id)}
+                      className="flex w-full items-center gap-3 p-3 text-left"
+                    >
+                      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${isLow ? 'bg-amber-50 text-amber-600' : 'bg-red-50 text-red-600'}`}>
+                        <PillIcon className="h-5 w-5" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5">
+                          {item.isPrimary && <span className="text-xs text-amber-500">★</span>}
+                          <p className="truncate text-sm font-black text-gray-900">{item.name}</p>
+                        </div>
+                        <p className="mt-0.5 truncate text-[11px] text-gray-500">
+                          {item.brand} · {item.dose} · {item.form}
+                          {item.location && (
+                            <span className="ml-1 inline-flex items-center gap-0.5 text-blue-500">
+                              · <MapPinIcon className="inline h-3 w-3" /> {item.location.storage}-{item.location.kolom}-{item.location.rak}
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                      <div className="shrink-0 text-right">
+                        <p className={`text-lg font-black ${item.stock === 0 ? 'text-red-600' : 'text-amber-600'}`}>
+                          {item.stock}
+                        </p>
+                        <p className="text-[10px] font-bold text-gray-400">pcs</p>
+                      </div>
+                      <ChevronDownIcon className={`h-4 w-4 shrink-0 text-gray-400 transition ${isExpanded ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    {/* Expanded detail */}
+                    {isExpanded && (
+                      <div className="border-t border-gray-100 bg-gray-50 px-4 py-3">
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                          <div>
+                            <p className="text-[10px] font-black uppercase tracking-wide text-gray-400">Kategori</p>
+                            <p className="text-xs font-bold text-gray-900">{item.category}</p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] font-black uppercase tracking-wide text-gray-400">Harga</p>
+                            <p className="text-xs font-bold text-gray-900">{formatRupiahSimple(item.price)}</p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] font-black uppercase tracking-wide text-gray-400">Stok Saat Ini</p>
+                            <p className={`text-xs font-bold ${item.stock === 0 ? 'text-red-600' : 'text-amber-600'}`}>
+                              {item.stock} pcs {item.stock === 0 ? '(HABIS)' : '(MENIPIS)'}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] font-black uppercase tracking-wide text-gray-400">Minimum Stok</p>
+                            <p className="text-xs font-bold text-gray-900">{item.minStock} pcs</p>
+                          </div>
+                          <div className="col-span-2">
+                            <p className="text-[10px] font-black uppercase tracking-wide text-gray-400">Indikasi</p>
+                            <p className="text-xs text-gray-700">{item.indications.join(', ') || '-'}</p>
+                          </div>
+                          {item.isPrimary && (
+                            <div className="col-span-2">
+                              <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-700">
+                                ★ Obat Utama (Primary) — Prioritas restock
+                              </span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Lokasi Penyimpanan */}
+                        {item.location && (
+                          <div className="mt-3 rounded-lg border border-blue-200 bg-blue-50 p-2.5">
+                            <div className="flex items-center gap-1.5">
+                              <MapPinIcon className="h-3.5 w-3.5 text-blue-600" />
+                              <p className="text-[10px] font-black uppercase tracking-wide text-blue-700">Lokasi Penyimpanan</p>
+                            </div>
+                            <div className="mt-2 grid grid-cols-4 gap-2">
+                              <div className="rounded-lg bg-white px-2.5 py-1.5 text-center">
+                                <p className="text-[9px] font-bold uppercase text-gray-400">Storage</p>
+                                <p className="text-sm font-black text-blue-700">{item.location.storage}</p>
+                              </div>
+                              <div className="rounded-lg bg-white px-2.5 py-1.5 text-center">
+                                <p className="text-[9px] font-bold uppercase text-gray-400">Kolom</p>
+                                <p className="text-sm font-black text-blue-700">{item.location.kolom}</p>
+                              </div>
+                              <div className="rounded-lg bg-white px-2.5 py-1.5 text-center">
+                                <p className="text-[9px] font-bold uppercase text-gray-400">Rak</p>
+                                <p className="text-sm font-black text-blue-700">{item.location.rak}</p>
+                              </div>
+                              <div className="rounded-lg bg-white px-2.5 py-1.5 text-center">
+                                <p className="text-[9px] font-bold uppercase text-gray-400">Zone</p>
+                                <p className="truncate text-[11px] font-black text-blue-700">{item.location.zone}</p>
+                              </div>
+                            </div>
+                            {item.location.notes && (
+                              <p className="mt-1.5 text-[10px] text-blue-600">Catatan: {item.location.notes}</p>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Alternative branches */}
+                        {item.altBranches.length > 0 ? (
+                          <div className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 p-2.5">
+                            <p className="text-[10px] font-black uppercase tracking-wide text-emerald-700">Tersedia di Cabang Lain:</p>
+                            <div className="mt-1.5 grid gap-1">
+                              {item.altBranches.map((alt) => (
+                                <div key={alt.branchId} className="flex items-center justify-between rounded-lg bg-white px-2.5 py-1.5">
+                                  <div>
+                                    <p className="text-xs font-bold text-gray-900">{alt.branchName}</p>
+                                    <p className="text-[10px] text-gray-500">{alt.branchId}</p>
+                                  </div>
+                                  <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-black text-emerald-700">
+                                    {alt.stock.qty} pcs
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="mt-3 rounded-lg border border-red-200 bg-red-50 p-2.5">
+                            <p className="text-[10px] font-black uppercase tracking-wide text-red-700">
+                              Tidak tersedia di cabang lain — segera order ke supplier
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="border-t border-gray-200 bg-gray-50 px-5 py-3">
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-gray-500">
+              Total: <span className="font-bold text-gray-900">{items.length} produk</span>
+              {isLow && items.filter((i) => i.isPrimary).length > 0 && (
+                <span className="ml-1.5 text-amber-600">
+                  ({items.filter((i) => i.isPrimary).length} ★ obat utama)
+                </span>
+              )}
+            </p>
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-lg bg-gray-900 px-4 py-2 text-xs font-bold text-white hover:bg-black"
+            >
+              Tutup
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Main ───────────────────────────────────────────────────────────────────
 
 /**
@@ -243,6 +494,7 @@ function ActionCard({ title, description, icon, badge, onClick, accent = 'slate'
  */
 export default function ServiceSelection({ onOpenStaff, onOpenHistory, onOpenMaster, onOpenStock }) {
   const { customers } = useCustomers();
+  const [stockModal, setStockModal] = useState(null); // 'low' | 'out' | null
   const stockValues = Object.values(branchStock[activeBranchId] ?? {});
   const lowStock = stockValues.filter((s) => s > 0 && s <= 20).length;
   const outOfStock = stockValues.filter((s) => s === 0).length;
@@ -416,7 +668,7 @@ export default function ServiceSelection({ onOpenStaff, onOpenHistory, onOpenMas
               value={lowStock}
               helper="Perlu restock"
               tone="amber"
-              onClick={() => lowStock > 0 && onOpenStock?.({ filter: 'low' })}
+              onClick={() => lowStock > 0 && setStockModal('low')}
             />
             <MetricCard
               icon={<BanIcon className="h-5 w-5" />}
@@ -424,7 +676,7 @@ export default function ServiceSelection({ onOpenStaff, onOpenHistory, onOpenMas
               value={outOfStock}
               helper="Tidak tersedia"
               tone="red"
-              onClick={() => outOfStock > 0 && onOpenStock?.({ filter: 'out' })}
+              onClick={() => outOfStock > 0 && setStockModal('out')}
             />
           </section>
 
@@ -466,6 +718,13 @@ export default function ServiceSelection({ onOpenStaff, onOpenHistory, onOpenMas
           </section>
         </main>
       </div>
+
+      {/* Stock Alert Modal */}
+      <StockAlertModal
+        open={stockModal !== null}
+        mode={stockModal}
+        onClose={() => setStockModal(null)}
+      />
     </div>
   );
 }

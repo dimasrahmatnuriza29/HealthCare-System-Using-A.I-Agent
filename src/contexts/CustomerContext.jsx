@@ -6,7 +6,7 @@ import {
 } from '../data/customerRecords.js';
 import useLocalStorage from '../hooks/useLocalStorage.js';
 
-const CUSTOMER_STORAGE_KEY = 'rakobat.customers.v1';
+const CUSTOMER_STORAGE_KEY = 'rakobat.customers.v2';
 const CustomerContext = createContext(null);
 
 function cloneCustomerRecords(records) {

@@ -144,10 +144,10 @@ export default function LocationStep({
                   </button>
                   <button
                     type="button"
-                    onClick={() => setClosingStep('counseling')}
+                    onClick={() => setClosingStep('payment')}
                     className="min-h-11 rounded-lg bg-gray-900 px-4 py-2 text-sm font-bold text-white hover:bg-black"
                   >
-                    Lanjut Edukasi & Catatan
+                    Lanjut ke Pembayaran
                   </button>
                 </>
               ) : (

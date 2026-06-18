@@ -1,0 +1,323 @@
+================================================================================
+WORKFLOW & TUJUAN PROTOTYPE: RakObat / PharmaLocate
+================================================================================
+
+KESIMPULAN TUJUAN PROTOTYPE
+================================================================================
+
+RakObat / PharmaLocate adalah Proof of Concept (POC) sistem digital untuk 
+OPERASIONAL PELAYANAN OBAT DI APOTEK yang bertujuan:
+
+"Membantu staff apotek melayani customer dengan CEPAT, AMAN, dan TERLACAK 
+— dari identifikasi customer, pemilihan obat, pengecekan keamanan, 
+pengambilan fisik obat dari rak, edukasi pasien, hingga pencatatan record 
+pelayanan."
+
+================================================================================
+
+MASALAH YANG INGIN DISELESAIKAN
+================================================================================
+
+1. RISIKO KESALAHAN PEMBERIAN OBAT
+   - Staff bisa salah memberikan obat yang bertentangan dengan alergi customer
+   - Contoh: Customer alergi Penisilin diberi Amoxicillin (golongan Penisilin)
+   - Contoh: Ibu hamil trimester 3 diberi Ibuprofen (berbahaya untuk janin)
+   - Prototype ini OTOMATIS mendeteksi dan MEMBLOKIR pemberian obat berisiko
+
+2. KESULITAN MENEMUKAN LOKASI OBAT DI RAK
+   - Apotek memiliki puluhan/ratusan obat di berbagai rak, kolom, dan zona
+   - Staff baru atau yang belum hafal bisa lama mencari lokasi obat
+   - Prototype ini LANGSUNG menunjukkan lokasi fisik obat (Storage, Kolom, Rak)
+     setelah safety check lolos
+
+3. TIDAK ADA REKAM JEJAK PELAYANAN
+   - Tanpa sistem, riwayat obat yang pernah diberikan ke customer tidak tercatat
+   - Catatan staff (misalnya "anak ini susah minum tablet, preferensi sirup") hilang
+   - Prototype ini MENYIMPAN setiap pelayanan ke record customer secara otomatis
+
+4. EDUKASI PASIEN TIDAK TERSTANDARISASI
+   - Setiap staff mungkin memberikan edukasi berbeda-beda
+   - Ada topik penting yang terlewat (efek samping, penyimpanan, kapan harus ke dokter)
+   - Prototype ini menyediakan CHECKLIST EDUKASI terstandar dengan materi spesifik
+     per obat
+
+5. TIDAK ADA KOORDINASI STAFF-APOTEKER
+   - Kapan staff harus minta validasi apoteker?
+   - Prototype ini OTOMATIS mengarahkan ke konsultasi apoteker jika ada risiko
+
+================================================================================
+
+ALUR KERJA (WORKFLOW) DETAIL
+================================================================================
+
+LANGKAH 1: IDENTIFIKASI CUSTOMER
+─────────────────────────────────
+- Staff mencari customer lama berdasarkan nama atau nomor HP
+- Jika customer baru → staff membuat profil baru:
+  * Nama, HP, Umur, Jenis Kelamin
+  * Alergi obat (Penisilin, Aspirin, NSAID, dll)
+  * Kondisi medis khusus (Hamil, Diabetes, Hipertensi, Gangguan Ginjal, dll)
+  * Catatan tambahan
+- Sistem langsung menampilkan profil customer:
+  * Riwayat obat sebelumnya
+  * Daftar alergi aktif
+  * Kondisi medis
+  * Catatan staff sebelumnya
+
+TUJUAN LANGKAH INI:
+→ Memastikan staff TAHU siapa yang dilayani dan kondisi medisnya SEBELUM 
+  memilih obat.
+
+─────────────────────────────────────────────────────────────────────────────
+
+LANGKAH 2: PEMILIHAN OBAT
+─────────────────────────────────
+- Staff mencari obat berdasarkan nama, indikasi, atau kategori
+- Filter tersedia: Analgesik, Antihistamin, Antibiotik, Lambung, Batuk, Vitamin
+- Sorting: nama, stok terbanyak/tersedikit, harga terendah/tertinggi
+- Setiap kartu obat menampilkan:
+  * Nama, dosis, bentuk sediaan, kategori
+  * Stok real-time di cabang aktif
+  * Harga
+  * INDIKATOR RISIKO LANGSUNG jika ada konflik dengan profil customer
+    (ikon merah/kuning muncul sebelum obat dipilih)
+- Staff bisa memilih BANYAK obat sekaligus
+
+TUJUAN LANGKAH INI:
+→ Staff memilih obat yang tepat dengan INFORMASI LENGKAP, dan sudah 
+  mendapat peringatan awal jika ada obat berisiko.
+
+─────────────────────────────────────────────────────────────────────────────
+
+LANGKAH 3: SAFETY CHECK (PENGECEKAN KEAMANAN)
+─────────────────────────────────
+Sistem mengevaluasi SETIAP obat terpilih terhadap profil customer:
+
+A. CEK ALERGI
+   - Apakah obat ini bertentangan dengan alergi yang tercatat?
+   - Contoh: Amoxicillin vs Alergi Penisilin → DANGER
+   - Contoh: Cefadroxil vs Alergi Penisilin → WARNING (risiko silang)
+
+B. CEK KONTRAINDIKASI
+   - Apakah ada kondisi medis yang melarang obat ini?
+   - Contoh: Ibuprofen vs Hamil Trimester 3 → DANGER
+
+C. CEK INTERAKSI OBAT
+   - Apakah ada interaksi negatif dengan obat yang pernah/sedang digunakan?
+   - Saat ini berbasis riwayat obat di record customer
+
+D. CEK USIA / DOSIS
+   - Apakah dosis sesuai untuk usia customer?
+   - Anak-anak mendapat rekomendasi dosis berbeda dari dewasa
+
+E. CEK CATATAN SEBELUMNYA
+   - Apakah ada catatan staff yang relevan?
+   - Contoh: "Budi susah minum tablet, preferensi sirup"
+
+HASIL SAFETY CHECK:
+┌─────────────────────────────────────────────────────────────────────┐
+│ STATUS        │ ARTI                    │ AKSI                      │
+├───────────────┼─────────────────────────┼───────────────────────────┤
+│ SAFE (Aman)   │ Tidak ada konflik       │ Lanjut ke picking         │
+│ WARNING       │ Perlu perhatian         │ Wajib konsultasi apoteker │
+│ DANGER        │ Risiko tinggi/dilarang  │ TIDAK BOLEH diberikan     │
+└─────────────────────────────────────────────────────────────────────┘
+
+KEPUTUSAN OTOMATIS:
+- Semua SAFE → Lokasi obat DIBUKA, staff bisa langsung mengambil
+- Ada WARNING → Lokasi TIDAK dibuka, harus konsultasi apoteker dulu
+- Ada DANGER → Lokasi TIDAK dibuka, obat TIDAK boleh diberikan
+- Stok HABIS → Lokasi tidak dibuka, sarankan alternatif atau cabang lain
+
+TUJUAN LANGKAH INI:
+→ MENCEGAH kesalahan pemberian obat yang berpotensi membahayakan pasien.
+→ Memberikan rekomendasi dosis yang tepat.
+→ Mengarahkan ke apoteker jika diperlukan.
+
+─────────────────────────────────────────────────────────────────────────────
+
+LANGKAH 4A: LOKASI PICKING (PENGAMBILAN FISIK OBAT)
+─────────────────────────────────
+Jika safety check LOLOS (semua aman):
+
+- Sistem menampilkan LOKASI FISIK setiap obat:
+  ┌──────────────────────────────────────────────────┐
+  │ Paracetamol 500mg                                │
+  │ ┌──────────┐ ┌──────────┐ ┌──────────┐         │
+  │ │ Storage  │ │  Kolom   │ │   Rak    │         │
+  │ │    A     │ │    1     │ │    2     │         │
+  │ └──────────┘ └──────────┘ └──────────┘         │
+  │ Zona: Analgesik                                  │
+  │ Stok: 50 pcs │ Harga: Rp 8.500                  │
+  └──────────────────────────────────────────────────┘
+
+- Kartu lokasi memiliki ANIMASI PULSE untuk menarik perhatian
+- Staff mengambil obat dari rak dan menekan "Ambil Semua Obat dari Rak"
+- Sistem mencatat WAKTU pengambilan (timestamp)
+- Jika salah ambil → bisa tekan "Tandai Salah Ambil" untuk reset
+
+TUJUAN LANGKAH INI:
+→ Staff LANGSUNG tahu di mana obat berada tanpa perlu bertanya atau mencari.
+→ Mempercepat proses picking terutama untuk staff baru.
+→ Mencatat waktu pengambilan untuk audit trail.
+
+─────────────────────────────────────────────────────────────────────────────
+
+LANGKAH 4B: EDUKASI & CATATAN
+─────────────────────────────────
+Setelah obat diambil, sebelum diserahkan ke customer:
+
+CHECKLIST EDUKASI (6 topik wajib):
+┌─────────────────────────────────────────────────────────────────────┐
+│ [ ] Aturan pakai                                                    │
+│     → "500mg setiap 4-6 jam, maksimal 4000mg per hari"             │
+│ [ ] Efek samping umum                                               │
+│     → "Mual ringan, ruam, atau reaksi alergi jarang terjadi"       │
+│ [ ] Cara penyimpanan                                                │
+│     → "Simpan di tempat sejuk dan kering, terlindung matahari"     │
+│ [ ] Waktu konsumsi                                                  │
+│     → "Dapat diminum sebelum atau sesudah makan"                   │
+│ [ ] Peringatan alergi                                               │
+│     → "Konfirmasi ulang alergi: Aspirin, Penisilin"                │
+│ [ ] Kapan harus konsultasi dokter/apoteker                          │
+│     → "Jika demam >3 hari, nyeri berat, atau muncul alergi"       │
+└─────────────────────────────────────────────────────────────────────┘
+
+- Materi edukasi SPESIFIK per obat (bukan generik)
+- Staff mencentang setiap topik yang sudah disampaikan ke customer
+- Staff mengisi nama pelayan dan catatan tambahan (opsional)
+- Status akhir: Diserahkan / Perlu Konsultasi / Batal
+
+TUJUAN LANGKAH INI:
+→ Memastikan customer mendapat EDUKASI LENGKAP sebelum obat diserahkan.
+→ Standarisasi informasi yang disampaikan.
+→ Dokumentasi bahwa edukasi sudah dilakukan.
+
+─────────────────────────────────────────────────────────────────────────────
+
+LANGKAH 4C: SELESAI (COMPLETION)
+─────────────────────────────────
+Setelah klik "Simpan & Selesaikan Pelayanan":
+
+- Record pelayanan OTOMATIS tersimpan ke profil customer:
+  * Tanggal pelayanan
+  * Obat yang diberikan + dosis
+  * Lokasi pengambilan
+  * Status keamanan
+  * Edukasi yang sudah diberikan
+  * Catatan staff
+  * Nama staff yang melayani
+
+- Customer record terupdate:
+  * Riwayat obat bertambah
+  * Catatan staff baru ditambahkan
+
+- Staff bisa langsung "Mulai Customer Baru" untuk pelayanan berikutnya
+
+TUJUAN LANGKAH INI:
+→ DOKUMENTASI LENGKAP setiap pelayanan untuk audit, tracability, dan 
+  referensi pelayanan berikutnya.
+
+================================================================================
+
+FITUR PENDUKUNG
+================================================================================
+
+1. DASHBOARD OPERASIONAL (Beranda)
+   - Ringkasan: jumlah customer, obat di katalog, stok menipis, stok habis
+   - Akses cepat ke semua fitur
+   - Indikator status operasional apotek
+
+2. MANAJEMEN STOK
+   - Pantau stok real-time per cabang
+   - Indikator: Aman / Hampir Habis / Habis
+   - Riwayat perubahan stok (masuk/keluar/alasan)
+   - Alert stok menipis langsung di dashboard
+
+3. PEMETAAN RAK (Master Data)
+   - Kelola lokasi obat di rak (Storage, Kolom, Rak)
+   - Batch number, tanggal kedaluwarsa
+   - Status aktif/tidak aktif
+
+4. RIWAYAT PELAYANAN
+   - Lacak semua transaksi dispensing
+   - Status: Selesai / Batal / Perlu Konsultasi
+   - Catatan apoteker
+   - Searchable & editable
+
+5. MULTI-CABANG
+   - 3 cabang apotek dengan stok dan harga berbeda
+   - Staff bisa pindah cabang kapan saja
+   - Lokasi obat konsisten antar cabang (pemetaan sama)
+
+================================================================================
+
+SIAPA PENGGUNA TARGET?
+================================================================================
+
+1. STAFF APOTEK (Pengguna Utama)
+   - Melayani customer sehari-hari
+   - Menggunakan alur dispensing 4 langkah
+   - Mendapat panduan lokasi obat dan safety check otomatis
+
+2. APOTEKER (Validator)
+   - Memvalidasi pelayanan yang berisiko (warning/danger)
+   - Memberikan catatan dan instruksi khusus
+   - Menerima request konsultasi dari staff
+
+3. ADMIN (Pengelola)
+   - Mengelola master data (lokasi rak, stok, pengguna)
+   - Memantau laporan dan riwayat pelayanan
+   - Mengatur konfigurasi sistem
+
+================================================================================
+
+KENAPA INI PENTING?
+================================================================================
+
+1. KESELAMATAN PASIEN
+   → Mencegah pemberian obat yang salah/berbahaya
+   → Deteksi alergi, kontraindikasi, dan interaksi SEBELUM obat diberikan
+
+2. EFISIENSI OPERASIONAL
+   → Staff langsung tahu lokasi obat tanpa cari-cari
+   → Proses picking lebih cepat
+   → Checklist edukasi terstandar
+
+3. TRACEABILITY (DAPAT DILACAK)
+   → Setiap pelayanan tercatat: siapa, kapan, obat apa, safety status apa
+   → Jika ada masalah, bisa ditelusuri recordnya
+
+4. KONSISTENSI PELAYANAN
+   → Semua staff mengikuti alur yang sama
+   → Edukasi yang diberikan konsisten dan lengkap
+   → Tidak ada langkah yang terlewat
+
+5. SCALABILITY
+   → Mudah ditambah cabang baru
+   → Mudah ditambah obat baru
+   → Siap diintegrasikan dengan AI safety advisor yang sesungguhnya
+
+================================================================================
+
+STATUS SAAT INI
+================================================================================
+
+Ini adalah MVP/POC (Proof of Concept) dengan keterbatasan:
+- Tidak ada backend (data di localStorage browser saja)
+- Safety check rule-based (bukan AI/ML sesungguhnya)
+- Belum ada authentication (role belum benar-benar diimplementasi)
+- Data obat terbatas (10 obat demo)
+- Belum ada fitur print/export laporan
+
+Tapi ARSITEKTUR dan ALUR sudah siap untuk:
+- Integrasi backend API
+- Integrasi AI safety advisor (prompt template sudah disiapkan)
+- Multi-user authentication
+- Database sesungguhnya (menggantikan localStorage)
+- Penambahan katalog obat yang lebih lengkap
+
+================================================================================
+Dokumen ini dibuat sebagai penjelasan tujuan dan alur kerja prototype 
+RakObat / PharmaLocate.
+================================================================================

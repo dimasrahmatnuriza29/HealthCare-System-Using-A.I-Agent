@@ -25,6 +25,7 @@ export const safetyTone = {
 
 export const closingWorkflowSteps = [
   { key: 'picking', label: 'Lokasi Picking' },
+  { key: 'payment', label: 'Pembayaran' },
   { key: 'counseling', label: 'Edukasi & Catatan' },
   { key: 'complete', label: 'Selesai' },
 ];

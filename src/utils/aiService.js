@@ -1,1 +1,1 @@
-export { evaluateSafetyAdvisor } from '../services/safetyService.js';
+export { aiSafetyCheck, aiRecommend, aiChat } from '../services/huggingFaceService.js';

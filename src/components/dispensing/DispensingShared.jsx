@@ -1,4 +1,8 @@
+import { useState, useEffect } from 'react';
 import { getAgeCategoryLabel, getConditionLabel } from '../../data/customerRecords.js';
+import { isoMonographs, isoConditionContraindications } from '../../data/isoReference.js';
+import { mimsDrugInteractions, checkAllergyRisk, mimsCrossReactivity } from '../../data/mimsReference.js';
+import { aiChat } from '../../services/huggingFaceService.js';
 import { AlertIcon, CheckIcon, CloseIcon, InfoIcon, SearchIcon } from '../ui/Icons.jsx';
 import { closingWorkflowSteps, workflowSteps } from './dispensingConfig.js';
 
@@ -172,8 +176,53 @@ export function RiskChipIcon({ status = 'warning' }) {
   );
 }
 
-export function RiskDetailModal({ open, title, status, message, onClose }) {
+export function RiskDetailModal({ open, title, status, message, onClose, medicineId, customer }) {
+  const [aiAnalysis, setAiAnalysis] = useState(null);
+  const [aiLoading, setAiLoading] = useState(false);
+
+  // Panggil AI saat modal dibuka
+  useEffect(() => {
+    if (!open || !medicineId || !customer) return;
+    setAiLoading(true);
+    setAiAnalysis(null);
+
+    const mono = isoMonographs[medicineId];
+    const medName = mono?.genericName || title;
+
+    // Bangun konteks lokal untuk dikirim ke AI
+    let localCtx = `Obat: ${medName}. `;
+    localCtx += `Customer: ${customer.name}, ${customer.age} tahun, `;
+    localCtx += `Alergi: ${(customer.allergies || []).join(', ') || 'tidak ada'}, `;
+    localCtx += `Kondisi: ${(customer.conditions || []).map(c => c.replace(/_/g, ' ')).join(', ') || 'tidak ada'}. `;
+    if (mono) {
+      localCtx += `ISO: Kelas ${mono.class}, Kehamilan kat. ${mono.pregnancyCategory} (${mono.pregnancyNote}), `;
+      localCtx += `Kontraindikasi: ${mono.contraindications.map(c => c.condition).join('; ')}. `;
+      localCtx += `Peringatan: ${mono.warnings.join('; ')}. `;
+    }
+
+    const question = `Analisa risiko pemberian obat ${medName} untuk customer ini. Deteksi risiko lokal: "${message}". Jelaskan kenapa berbahaya/perlu perhatian berdasarkan ISO/MIMS, dan berikan saran alternatif jika ada. Jawab singkat dalam 3-5 kalimat bahasa Indonesia.\n\nKonteks:\n${localCtx}`;
+
+    aiChat(question, customer).then((result) => {
+      setAiAnalysis(result);
+      setAiLoading(false);
+    });
+  }, [open, medicineId, customer, title, message]);
+
   if (!open) return null;
+
+  // Kumpulkan data ISO/MIMS lokal untuk ditampilkan
+  const mono = isoMonographs[medicineId];
+  const allergyRisks = [];
+  for (const allergy of (customer?.allergies || [])) {
+    const risk = checkAllergyRisk(allergy, medicineId);
+    if (risk) allergyRisks.push({ allergy, ...risk });
+  }
+  const contraList = [];
+  for (const cond of (customer?.conditions || [])) {
+    const condData = isoConditionContraindications[cond];
+    if (condData?.forbidden?.includes(medicineId)) contraList.push({ cond: cond.replace(/_/g, ' '), severity: 'DILARANG' });
+    if (condData?.caution?.includes(medicineId)) contraList.push({ cond: cond.replace(/_/g, ' '), severity: 'PERHATIAN' });
+  }
 
   const panelTone =
     status === 'danger'
@@ -187,7 +236,7 @@ export function RiskDetailModal({ open, title, status, message, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <button type="button" className="absolute inset-0 bg-black/40" onClick={onClose} aria-label="Tutup detail risiko" />
-      <div className={`relative w-full max-w-md rounded-xl border p-4 shadow-xl ${panelTone} `}>
+      <div className={`relative max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-xl border p-4 shadow-xl ${panelTone}`}>
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-[11px] font-black uppercase tracking-wide text-gray-600">Detail Risiko</p>
@@ -198,8 +247,75 @@ export function RiskDetailModal({ open, title, status, message, onClose }) {
           </button>
         </div>
 
-        <div className="mt-3 rounded-lg border border-white/60 bg-white/60 p-3">
-          <p className="text-xs font-semibold leading-6 text-gray-800 [overflow-wrap:anywhere]">{message}</p>
+        {/* REFERENSI ISO */}
+        {mono && (
+          <div className="mt-3 rounded-lg border border-teal-200 bg-teal-50 p-3">
+            <p className="text-[10px] font-black uppercase tracking-wide text-teal-700">📋 Referensi ISO</p>
+            <div className="mt-1.5 grid gap-1 text-xs text-gray-700">
+              <p><span className="font-bold text-teal-800">Kelas:</span> {mono.class}</p>
+              <p><span className="font-bold text-teal-800">Kehamilan:</span> Kategori {mono.pregnancyCategory} — {mono.pregnancyNote}</p>
+              {mono.contraindications?.length > 0 && (
+                <div>
+                  <span className="font-bold text-teal-800">Kontraindikasi ISO:</span>
+                  <ul className="mt-0.5 space-y-0.5 pl-3">
+                    {mono.contraindications.map((c, i) => (
+                      <li key={i}>
+                        <span className={`mr-1 rounded px-1 py-0.5 text-[10px] font-bold ${c.severity === 'absolut' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>
+                          {c.severity?.toUpperCase()}
+                        </span>
+                        {c.condition}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              <p><span className="font-bold text-teal-800">Ref:</span> <span className="italic">{mono.ref}</span></p>
+            </div>
+          </div>
+        )}
+
+        {/* REFERENSI MIMS — Alergi Silang */}
+        {allergyRisks.length > 0 && (
+          <div className="mt-2 rounded-lg border border-blue-200 bg-blue-50 p-3">
+            <p className="text-[10px] font-black uppercase tracking-wide text-blue-700">💊 MIMS: Alergi Silang</p>
+            <ul className="mt-1.5 space-y-1">
+              {allergyRisks.map((ar, i) => (
+                <li key={i} className="text-xs text-gray-700">
+                  <span className={`mr-1 rounded px-1 py-0.5 text-[10px] font-bold ${ar.risk === 'high' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>
+                    {ar.risk?.toUpperCase()}
+                  </span>
+                  Alergi "{ar.allergy}" → {ar.note} ({ar.percent}) <span className="italic text-gray-500">Ref: {ar.ref}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* KONTRAINDIKASI CUSTOMER */}
+        {contraList.length > 0 && (
+          <div className="mt-2 rounded-lg border border-red-200 bg-red-50/50 p-3">
+            <p className="text-[10px] font-black uppercase tracking-wide text-red-700">🚫 Kontraindikasi untuk Customer Ini</p>
+            <ul className="mt-1.5 space-y-1">
+              {contraList.map((c, i) => (
+                <li key={i} className="text-xs font-bold text-red-700">{c.severity}: {c.cond}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* ANALISA AI */}
+        <div className="mt-3 rounded-lg border border-violet-200 bg-violet-50 p-3">
+          <p className="text-[10px] font-black uppercase tracking-wide text-violet-700">🤖 Analisa AI</p>
+          {aiLoading ? (
+            <div className="mt-2 flex items-center gap-2">
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-violet-600 border-t-transparent"></div>
+              <p className="text-xs text-violet-700">AI sedang menganalisa berdasarkan ISO/MIMS...</p>
+            </div>
+          ) : aiAnalysis?.success ? (
+            <p className="mt-1.5 text-xs leading-5 text-gray-800">{aiAnalysis.answer}</p>
+          ) : (
+            <p className="mt-1.5 text-xs text-gray-500">{aiAnalysis?.answer || 'AI tidak tersedia. Gunakan referensi ISO/MIMS di atas.'}</p>
+          )}
         </div>
 
         <div className="mt-4 flex justify-end">

@@ -4,6 +4,7 @@ import CustomerStep from './dispensing/CustomerStep.jsx';
 import { WorkflowStepper } from './dispensing/DispensingShared.jsx';
 import LocationStep from './dispensing/LocationStep.jsx';
 import MedicineStep from './dispensing/MedicineStep.jsx';
+import PaymentStep from './dispensing/PaymentStep.jsx';
 import SafetyStep from './dispensing/SafetyStep.jsx';
 import StaffLocatorHeader from './dispensing/StaffLocatorHeader.jsx';
 
@@ -36,6 +37,7 @@ export default function StaffLocator({ onBack }) {
           inventoryRows={workflow.inventoryRows}
           selectedMedicineIds={workflow.selectedMedicineIds}
           safetyWasReviewed={workflow.safetyWasReviewed}
+          activeBranchId={workflow.activeBranchId}
           onChangeCustomer={() => workflow.goToStep('customer')}
           onSelectMedicine={workflow.selectMedicine}
           onCheckSafety={workflow.checkSafety}
@@ -50,6 +52,9 @@ export default function StaffLocator({ onBack }) {
           advisoryItems={workflow.advisoryItems}
           overallSafetyStatus={workflow.overallSafetyStatus}
           decision={workflow.decision}
+          aiLoading={workflow.aiLoading}
+          aiResult={workflow.aiResult}
+          aiError={workflow.aiError}
           onChangeCustomer={() => workflow.goToStep('customer')}
           onBackToMedicine={() => workflow.goToStep('medicine')}
           onMoveToFinalAction={workflow.moveToFinalAction}
@@ -73,6 +78,18 @@ export default function StaffLocator({ onBack }) {
           onBackToMedicine={() => workflow.goToStep('medicine')}
           onRequestPharmacist={() => workflow.setPharmacistRequested(true)}
           onStartNewCustomer={workflow.reset}
+        />
+      );
+    }
+
+    if (workflow.currentStep === 'location' && workflow.closingStep === 'payment') {
+      return (
+        <PaymentStep
+          activeCustomer={workflow.activeCustomer}
+          selectedItems={workflow.selectedItems}
+          closingStep={workflow.closingStep}
+          onConfirmPayment={workflow.confirmPayment}
+          onBackToPicking={() => workflow.setClosingStep('picking')}
         />
       );
     }

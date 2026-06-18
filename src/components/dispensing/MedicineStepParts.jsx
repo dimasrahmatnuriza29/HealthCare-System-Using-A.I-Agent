@@ -1,23 +1,35 @@
 import { useState } from 'react';
-import { evaluateSafetyAdvisor } from '../../services/safetyService.js';
+import { isoMonographs, isoConditionContraindications } from '../../data/isoReference.js';
+import { checkAllergyRisk } from '../../data/mimsReference.js';
 import { CloseIcon } from '../ui/Icons.jsx';
 import { RiskChipIcon, RiskDetailModal } from './DispensingShared.jsx';
 import { formatRupiah } from './dispensingUtils.js';
 
+// Quick local preview (tidak panggil AI, hanya cek cepat dari ISO/MIMS data)
+function quickRiskPreview(customer, medicineId) {
+  if (!customer) return null;
+  // Cek alergi
+  for (const allergy of (customer.allergies || [])) {
+    const risk = checkAllergyRisk(allergy, medicineId);
+    if (risk && risk.risk === 'high') return { status: 'danger', message: `Alergi ${allergy}: ${risk.note}` };
+    if (risk && risk.risk === 'moderate') return { status: 'warning', message: `Alergi ${allergy}: ${risk.note}` };
+  }
+  // Cek kondisi medis
+  for (const cond of (customer.conditions || [])) {
+    const condData = isoConditionContraindications[cond];
+    if (condData?.forbidden?.includes(medicineId)) return { status: 'danger', message: `Kontraindikasi: ${cond.replace(/_/g, ' ')}` };
+    if (condData?.caution?.includes(medicineId)) return { status: 'warning', message: `Perhatian: ${cond.replace(/_/g, ' ')}` };
+  }
+  return null;
+}
+
 export function MedicineCard({ item, customer, selected, onSelect }) {
-  const preview = customer ? evaluateSafetyAdvisor(customer, item.medicine, item) : null;
+  const riskCheck = quickRiskPreview(customer, item.id);
   const isInactive = item.stock === 0;
   const [showRiskDetail, setShowRiskDetail] = useState(false);
-  const riskCheck =
-    preview?.allergyCheck.status !== 'safe'
-      ? preview.allergyCheck
-      : preview?.contraindicationCheck.status !== 'safe'
-        ? preview.contraindicationCheck
-        : preview?.interactionCheck.status !== 'safe'
-          ? preview.interactionCheck
-          : null;
   const riskStatus = riskCheck?.status ?? 'safe';
   const hasRisk = Boolean(riskCheck && riskStatus !== 'safe');
+  const isPrimary = item.medicine?.isPrimary || false;
 
   return (
     <>
@@ -43,10 +55,18 @@ export function MedicineCard({ item, customer, selected, onSelect }) {
 
         <div className="grid min-w-0 grid-cols-1 items-start gap-2">
           <div className="min-w-0">
-            <h3 className="break-words text-sm font-black leading-tight text-gray-900">{item.medicine.name}</h3>
+            <h3 className="break-words text-sm font-black leading-tight text-gray-900">
+              {isPrimary && <span className="mr-1 text-amber-500">★</span>}
+              {item.medicine.name}
+            </h3>
             <p className="mt-1 min-w-0 break-words text-[11px] font-semibold leading-4 text-gray-500">
-              {item.medicine.dose} · {item.medicine.form} · {item.medicine.category}
+              {item.medicine.brand && `${item.medicine.brand} · `}{item.medicine.dose} · {item.medicine.form} · {item.medicine.category}
             </p>
+            {isPrimary && (
+              <span className="mt-1 inline-block rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700">
+                ★ Obat Utama
+              </span>
+            )}
           </div>
         </div>
 
@@ -84,6 +104,8 @@ export function MedicineCard({ item, customer, selected, onSelect }) {
         title={item.medicine.name}
         status={riskStatus}
         message={riskCheck?.message ?? ''}
+        medicineId={item.id}
+        customer={customer}
         onClose={() => setShowRiskDetail(false)}
       />
     </>

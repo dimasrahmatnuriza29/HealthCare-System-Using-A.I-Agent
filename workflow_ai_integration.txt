@@ -1,0 +1,885 @@
+================================================================================
+RENCANA INTEGRASI AI: RakObat / PharmaLocate
+================================================================================
+
+JAWABAN: YA, INI BISA DIBUAT.
+================================================================================
+
+Arsitektur prototype saat ini SUDAH disiapkan untuk integrasi AI.
+File safetyService.js sudah memiliki template prompt dan struktur evaluasi
+yang tinggal dihubungkan ke model AI sesungguhnya (menggantikan rule-based).
+
+================================================================================
+
+KONSEP: AI SEBAGAI "APOTEKER DIGITAL"
+================================================================================
+
+AI akan berfungsi sebagai asisten cerdas yang:
+1. MEMVALIDASI obat yang dipilih (oleh customer atau staff)
+2. MENGECEK terhadap history customer
+3. MEREFERENSI ISO & MIMS sebagai sumber kebenaran
+4. MEMBERIKAN peringatan dan rekomendasi real-time
+
+================================================================================
+
+3 SKENARIO DETAIL
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ SKENARIO 1: CUSTOMER BARU + SUDAH TAHU MAU BELI APA                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+SITUASI:
+- Customer datang pertama kali
+- Sudah tahu mau beli obat tertentu (misal: "Saya mau beli Ibuprofen")
+- Belum ada history di sistem
+
+ALUR DENGAN AI:
+
+  Customer: "Saya mau beli Ibuprofen"
+       │
+       ▼
+  ┌─────────────────────────────────────┐
+  │ STAFF: Input profil customer baru   │
+  │ - Nama, umur, jenis kelamin         │
+  │ - Tanya alergi → dicatat            │
+  │ - Tanya kondisi medis → dicatat     │
+  │ - Tanya obat lain yg sedang diminum │
+  └─────────────────────────────────────┘
+       │
+       ▼
+  ┌─────────────────────────────────────┐
+  │ AI MEMVALIDASI berdasarkan ISO/MIMS │
+  │                                     │
+  │ Input ke AI:                        │
+  │ - Obat: Ibuprofen 400mg             │
+  │ - Profil: Wanita, 28 tahun          │
+  │ - Alergi: Aspirin                   │
+  │ - Kondisi: Hamil trimester 3        │
+  │ - Obat lain: tidak ada              │
+  │                                     │
+  │ AI mengecek ISO/MIMS:              │
+  │ → Ibuprofen = NSAID                 │
+  │ → Alergi Aspirin = cross-react NSAID│
+  │ → Hamil T3 = KONTRAINDIKASI NSAID   │
+  └─────────────────────────────────────┘
+       │
+       ▼
+  ┌─────────────────────────────────────┐
+  │ HASIL AI:                           │
+  │ ⛔ DANGER - TIDAK BOLEH DIBERIKAN   │
+  │                                     │
+  │ Alasan:                             │
+  │ 1. Alergi Aspirin → risiko reaksi   │
+  │    silang dengan Ibuprofen (NSAID)  │
+  │    [Ref: MIMS - NSAID Cross-React]  │
+  │                                     │
+  │ 2. Kehamilan trimester 3 →          │
+  │    Ibuprofen dapat menyebabkan      │
+  │    penutupan dini duktus arteriosus  │
+  │    [Ref: ISO - Kontraindikasi]      │
+  │                                     │
+  │ REKOMENDASI AI:                     │
+  │ → Paracetamol 500mg sebagai         │
+  │   alternatif analgesik yang lebih   │
+  │   aman untuk ibu hamil              │
+  │ → Konsultasi dokter jika nyeri berat│
+  └─────────────────────────────────────┘
+       │
+       ▼
+  Staff menjelaskan ke customer → catat ke record
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ SKENARIO 2: CUSTOMER LAMA + SUDAH TAHU MAU BELI + ADA HISTORY              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+SITUASI:
+- Customer sudah terdaftar di sistem
+- Punya history obat sebelumnya
+- Datang dan minta obat tertentu
+
+ALUR DENGAN AI:
+
+  Customer: "Saya mau beli Amoxicillin lagi"
+       │
+       ▼
+  ┌─────────────────────────────────────┐
+  │ STAFF: Cari customer di sistem      │
+  │ → Ditemukan: Budi Santoso           │
+  │ → Sistem OTOMATIS load history      │
+  └─────────────────────────────────────┘
+       │
+       ▼
+  ┌─────────────────────────────────────┐
+  │ AI MENGANALISIS HISTORY + ISO/MIMS  │
+  │                                     │
+  │ Input ke AI:                        │
+  │ - Obat diminta: Amoxicillin 500mg   │
+  │ - Profil: Laki-laki, 7 tahun (anak) │
+  │ - Alergi: Penisilin                 │
+  │ - History obat sebelumnya:          │
+  │   * 2 minggu lalu: Paracetamol ✓    │
+  │   * 1 bulan lalu: OBH Combi ✓      │
+  │ - Catatan staff: "Susah minum       │
+  │   tablet, preferensi sirup"         │
+  │                                     │
+  │ AI mengecek ISO/MIMS:              │
+  │ → Amoxicillin = golongan PENISILIN  │
+  │ → Customer ALERGI Penisilin         │
+  │ → MATCH! KONTRAINDIKASI ABSOLUT     │
+  └─────────────────────────────────────┘
+       │
+       ▼
+  ┌─────────────────────────────────────┐
+  │ HASIL AI:                           │
+  │ ⛔ DANGER - DILARANG KERAS          │
+  │                                     │
+  │ Alasan:                             │
+  │ Amoxicillin adalah antibiotik       │
+  │ golongan Penisilin. Customer ini    │
+  │ tercatat ALERGI PENISILIN.          │
+  │ Pemberian dapat menyebabkan reaksi  │
+  │ anafilaksis yang mengancam jiwa.    │
+  │ [Ref: ISO - Kontraindikasi Absolut] │
+  │ [Ref: MIMS - Penicillin Allergy]    │
+  │                                     │
+  │ CATATAN DARI HISTORY:               │
+  │ → Customer anak 7 tahun             │
+  │ → Preferensi sediaan: SIRUP         │
+  │                                     │
+  │ REKOMENDASI AI:                     │
+  │ → Jika butuh antibiotik, gunakan    │
+  │   golongan Makrolida (Azithromycin) │
+  │   yang lebih aman untuk alergi      │
+  │   Penisilin                         │
+  │ → Sediaan sirup jika tersedia       │
+  │ → WAJIB konsultasi dokter untuk     │
+  │   resep antibiotik pengganti        │
+  └─────────────────────────────────────┘
+       │
+       ▼
+  Staff menjelaskan → arahkan ke dokter → catat ke record
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ SKENARIO 3: CUSTOMER LAMA + STAFF MEREKOMENDASIKAN OBAT                     │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+SITUASI:
+- Customer datang dengan keluhan (misal: "batuk berdahak 3 hari")
+- Staff merekomendasikan obat berdasarkan keluhan
+- Sistem punya history customer
+
+ALUR DENGAN AI:
+
+  Customer: "Saya batuk berdahak sudah 3 hari"
+       │
+       ▼
+  ┌─────────────────────────────────────┐
+  │ STAFF: Cari customer di sistem      │
+  │ → Ditemukan: Rina Wijaya            │
+  │ → Profil: Wanita, 32 thn, Hamil T3 │
+  │ → History: Paracetamol (minggu lalu)│
+  └─────────────────────────────────────┘
+       │
+       ▼
+  ┌─────────────────────────────────────┐
+  │ STAFF bertanya ke AI:               │
+  │ "Customer batuk berdahak 3 hari,    │
+  │  obat apa yang aman?"               │
+  │                                     │
+  │ AI MENGANALISIS:                    │
+  │ - Keluhan: batuk berdahak           │
+  │ - Profil: hamil trimester 3         │
+  │ - Alergi: tidak ada                 │
+  │ - Obat saat ini: Paracetamol        │
+  │                                     │
+  │ AI mengecek ISO/MIMS:              │
+  │ → Obat batuk yang AMAN untuk hamil: │
+  │   * Dextromethorphan (hati-hati)    │
+  │   * Guaifenesin (relatif aman)      │
+  │ → Obat batuk yang TIDAK AMAN:       │
+  │   * Kodein (opioid, hindari)        │
+  │   * Bromhexine (data terbatas)      │
+  │ → Interaksi dgn Paracetamol: aman   │
+  └─────────────────────────────────────┘
+       │
+       ▼
+  ┌─────────────────────────────────────┐
+  │ REKOMENDASI AI:                     │
+  │                                     │
+  │ ✅ DIREKOMENDASIKAN:                │
+  │ 1. Guaifenesin (Mucinex) - Sirup    │
+  │    → Ekspektoran, relatif aman      │
+  │      untuk ibu hamil                │
+  │    → Tidak berinteraksi dgn         │
+  │      Paracetamol yg sedang diminum  │
+  │    [Ref: ISO - Kategori B kehamilan]│
+  │                                     │
+  │ ⚠️ PERHATIAN:                       │
+  │ 2. OBH Combi - Sirup               │
+  │    → Mengandung campuran, beberapa  │
+  │      komponen perlu hati-hati       │
+  │    → Konsultasi apoteker dulu       │
+  │                                     │
+  │ ⛔ HINDARI:                         │
+  │ 3. Obat batuk mengandung Kodein     │
+  │    → Tidak aman untuk ibu hamil     │
+  │    [Ref: MIMS - Pregnancy Cat. D]   │
+  │                                     │
+  │ CATATAN AI:                         │
+  │ → Jika batuk >7 hari, sarankan      │
+  │   konsultasi dokter                 │
+  │ → Monitor karena sedang hamil T3    │
+  └─────────────────────────────────────┘
+       │
+       ▼
+  Staff pilih obat yang direkomendasikan AI → validasi → proses
+
+
+================================================================================
+
+PERAN ISO & MIMS SEBAGAI KNOWLEDGE BASE
+================================================================================
+
+APA ITU ISO?
+─────────────
+ISO (Informasi Spesialite Obat) / ISFI:
+- Buku panduan obat resmi Indonesia
+- Berisi: komposisi, indikasi, kontraindikasi, dosis, efek samping,
+  interaksi obat, peringatan khusus
+- Menjadi rujukan apoteker di Indonesia
+
+APA ITU MIMS?
+─────────────
+MIMS (Monthly Index of Medical Specialities):
+- Database referensi obat internasional (termasuk Indonesia)
+- Berisi: monografi obat lengkap, interaksi obat-obat, 
+  kategori kehamilan, dosis pediatrik/geriatrik
+- Digunakan oleh tenaga medis profesional
+
+BAGAIMANA AI MENGGUNAKAN ISO/MIMS?
+───────────────────────────────────
+
+Ada 2 pendekatan teknis:
+
+PENDEKATAN A: RAG (Retrieval-Augmented Generation)
+┌─────────────────────────────────────────────────────────────────────┐
+│                                                                     │
+│  ┌──────────┐     ┌──────────────┐     ┌──────────────────┐       │
+│  │ Data ISO │────▶│  Embedding   │────▶│ Vector Database  │       │
+│  │ Data MIMS│     │  (chunked)   │     │ (Pinecone/Weaviate│       │
+│  └──────────┘     └──────────────┘     │  /ChromaDB)      │       │
+│                                         └────────┬─────────┘       │
+│                                                  │                  │
+│  ┌──────────────────┐                           │ retrieve         │
+│  │ Query dari Staff │─────────────────────────▶│ relevant chunks  │
+│  │ "Ibuprofen aman  │                           │                  │
+│  │  untuk hamil T3?"|                           ▼                  │
+│  └──────────────────┘     ┌──────────────────────────────┐        │
+│                            │ LLM (GPT-4 / Claude / Gemini)│        │
+│                            │ + Context dari ISO/MIMS       │        │
+│                            │ + Profil Customer             │        │
+│                            │ + History Obat                │        │
+│                            └──────────────┬───────────────┘        │
+│                                           │                         │
+│                                           ▼                         │
+│                            ┌──────────────────────────────┐        │
+│                            │ JAWABAN AI:                   │        │
+│                            │ "Ibuprofen TIDAK AMAN untuk   │        │
+│                            │  hamil T3. Ref: ISO hal.xxx,  │        │
+│                            │  MIMS Cat.D. Alternatif:      │        │
+│                            │  Paracetamol (Cat.B)"         │        │
+│                            └──────────────────────────────┘        │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+
+PENDEKATAN B: FINE-TUNED MODEL + STRUCTURED DATABASE
+┌─────────────────────────────────────────────────────────────────────┐
+│                                                                     │
+│  ┌──────────────────────────────────────────────┐                  │
+│  │ DATABASE TERSTRUKTUR                          │                  │
+│  ├──────────────────────────────────────────────┤                  │
+│  │ Tabel: drug_interactions                      │                  │
+│  │ - drug_a, drug_b, severity, description       │                  │
+│  │                                               │                  │
+│  │ Tabel: contraindications                      │                  │
+│  │ - drug_id, condition, severity, ref_iso/mims  │                  │
+│  │                                               │                  │
+│  │ Tabel: drug_allergies                         │                  │
+│  │ - drug_id, allergy_group, cross_reactivity    │                  │
+│  │                                               │                  │
+│  │ Tabel: dosage_guidelines                      │                  │
+│  │ - drug_id, age_group, weight_range, dose,     │                  │
+│  │   frequency, max_daily, ref_source            │                  │
+│  │                                               │                  │
+│  │ Tabel: pregnancy_categories                   │                  │
+│  │ - drug_id, category (A/B/C/D/X), trimester,   │                  │
+│  │   notes, ref_source                           │                  │
+│  └──────────────────────────────────────────────┘                  │
+│                          │                                          │
+│                          ▼                                          │
+│  ┌──────────────────────────────────────────────┐                  │
+│  │ AI ENGINE (menggabungkan):                    │                  │
+│  │ 1. Query database terstruktur                 │                  │
+│  │ 2. LLM untuk natural language reasoning       │                  │
+│  │ 3. Profil + history customer                  │                  │
+│  │ 4. Menghasilkan penjelasan yang bisa dipahami │                  │
+│  └──────────────────────────────────────────────┘                  │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+
+REKOMENDASI: Gunakan KOMBINASI keduanya:
+- Database terstruktur untuk pengecekan CEPAT dan DETERMINISTIK
+  (alergi, kontraindikasi absolut, interaksi obat yang sudah pasti)
+- RAG + LLM untuk analisis yang lebih KOMPLEKS dan PENJELASAN
+  (rekomendasi alternatif, counseling, kasus edge-case)
+
+
+================================================================================
+
+ARSITEKTUR TEKNIS YANG DIUSULKAN
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         FRONTEND (React - sudah ada)                         │
+│                                                                             │
+│  ┌───────────┐  ┌───────────┐  ┌───────────┐  ┌───────────────────┐       │
+│  │ Customer  │  │  Medicine  │  │  Safety   │  │ Location/Counsel  │       │
+│  │   Step    │  │    Step    │  │   Step    │  │      Step         │       │
+│  └─────┬─────┘  └─────┬─────┘  └─────┬─────┘  └─────────┬─────────┘       │
+│        │               │               │                   │                 │
+└────────┼───────────────┼───────────────┼───────────────────┼─────────────────┘
+         │               │               │                   │
+         ▼               ▼               ▼                   ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           BACKEND API (baru)                                 │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                        AI SAFETY ENGINE                              │   │
+│  ├─────────────────────────────────────────────────────────────────────┤   │
+│  │                                                                     │   │
+│  │  ┌─────────────────┐   ┌─────────────────┐   ┌────────────────┐   │   │
+│  │  │ Rule Engine     │   │ RAG Engine      │   │ LLM Service    │   │   │
+│  │  │ (cepat, pasti)  │   │ (ISO/MIMS docs) │   │ (GPT/Claude)   │   │   │
+│  │  │                 │   │                 │   │                │   │   │
+│  │  │ - Alergi match  │   │ - Cari referensi│   │ - Analisis     │   │   │
+│  │  │ - Kontraindikasi│   │ - Dosis detail  │   │ - Rekomendasi  │   │   │
+│  │  │ - Interaksi obat│   │ - Peringatan    │   │ - Penjelasan   │   │   │
+│  │  │ - Dosis range   │   │ - Alternatif    │   │ - Counseling   │   │   │
+│  │  └────────┬────────┘   └────────┬────────┘   └───────┬────────┘   │   │
+│  │           │                      │                     │            │   │
+│  │           └──────────────────────┼─────────────────────┘            │   │
+│  │                                  ▼                                  │   │
+│  │                    ┌─────────────────────────┐                     │   │
+│  │                    │    COMBINED RESPONSE     │                     │   │
+│  │                    │  - Safety status         │                     │   │
+│  │                    │  - Referensi ISO/MIMS    │                     │   │
+│  │                    │  - Rekomendasi           │                     │   │
+│  │                    │  - Penjelasan            │                     │   │
+│  │                    └─────────────────────────┘                     │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                         DATABASE                                     │   │
+│  ├─────────────────────────────────────────────────────────────────────┤   │
+│  │  ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐   │   │
+│  │  │ Customers  │  │ Medicines  │  │ ISO/MIMS   │  │  Service   │   │   │
+│  │  │ + History  │  │ + Stock    │  │  Knowledge │  │  Records   │   │   │
+│  │  └────────────┘  └────────────┘  └────────────┘  └────────────┘   │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                    VECTOR DATABASE                                    │   │
+│  ├─────────────────────────────────────────────────────────────────────┤   │
+│  │  ISO documents (chunked + embedded)                                  │   │
+│  │  MIMS documents (chunked + embedded)                                 │   │
+│  │  Drug monographs                                                     │   │
+│  │  Clinical guidelines                                                 │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+================================================================================
+
+CONTOH PROMPT AI KE LLM (TEMPLATE)
+================================================================================
+
+Berikut contoh prompt yang akan dikirim ke AI untuk setiap skenario:
+
+--- PROMPT TEMPLATE ---
+
+Kamu adalah Apoteker Digital AI yang bertugas memvalidasi keamanan obat.
+Kamu WAJIB mereferensi ISO (Informasi Spesialite Obat) dan MIMS sebagai 
+sumber kebenaran utama.
+
+PROFIL CUSTOMER:
+- Nama: {customer_name}
+- Usia: {age} tahun ({age_category})
+- Jenis Kelamin: {gender}
+- Alergi Tercatat: {allergies}
+- Kondisi Medis: {conditions}
+- Obat yang Sedang Diminum: {current_medications}
+
+RIWAYAT OBAT (6 bulan terakhir):
+{medicine_history}
+
+CATATAN STAFF SEBELUMNYA:
+{previous_notes}
+
+OBAT YANG DIMINTA/DIPILIH:
+- Nama: {medicine_name}
+- Dosis: {dose}
+- Golongan: {drug_class}
+
+KONTEKS ISO/MIMS (dari RAG retrieval):
+{retrieved_iso_mims_context}
+
+TUGAS:
+1. Evaluasi keamanan obat ini untuk customer di atas
+2. Cek: alergi, kontraindikasi, interaksi obat, kesesuaian dosis
+3. Berikan status: SAFE / WARNING / DANGER
+4. Jika tidak aman, jelaskan alasannya dengan referensi ISO/MIMS
+5. Rekomendasikan alternatif yang lebih aman (jika ada)
+6. Berikan saran edukasi untuk staff
+
+FORMAT JAWABAN:
+{
+  "safetyStatus": "safe|warning|danger",
+  "reason": "penjelasan detail",
+  "references": ["ISO hal.xxx", "MIMS - Drug Interaction"],
+  "alternatives": ["obat alternatif 1", "obat alternatif 2"],
+  "staffAdvice": "saran untuk staff",
+  "educationPoints": ["poin edukasi 1", "poin edukasi 2"],
+  "doseRecommendation": "dosis yang tepat"
+}
+
+--- END PROMPT ---
+
+
+================================================================================
+
+TECH STACK YANG DIBUTUHKAN UNTUK IMPLEMENTASI
+================================================================================
+
+FRONTEND (sudah ada, perlu modifikasi minor):
+- React 19 + Vite (sudah ada)
+- Tambah: loading state saat menunggu AI response
+- Tambah: panel tampilan referensi ISO/MIMS
+
+BACKEND (perlu dibuat baru):
+- Node.js + Express ATAU Python + FastAPI
+- Endpoint: POST /api/safety-check
+- Endpoint: POST /api/recommend-medicine  
+- Endpoint: GET /api/customer/:id/history
+
+AI/LLM SERVICE:
+- OpenAI GPT-4 API  ATAU
+- Anthropic Claude API  ATAU  
+- Google Gemini API  ATAU
+- Model lokal (Llama 3, Mistral) untuk privasi data medis
+
+VECTOR DATABASE (untuk RAG):
+- Pinecone (cloud, mudah)  ATAU
+- Weaviate (self-hosted)  ATAU
+- ChromaDB (ringan, lokal)  ATAU
+- PostgreSQL + pgvector (jika sudah pakai PostgreSQL)
+
+DATABASE UTAMA:
+- PostgreSQL (untuk data customer, obat, transaksi)
+- Redis (cache untuk response AI yang sering diulang)
+
+KNOWLEDGE BASE:
+- ISO Indonesia (digitalisasi → chunking → embedding)
+- MIMS Indonesia (digitalisasi → chunking → embedding)
+- Formularium Nasional (opsional)
+- Panduan Praktik Klinis Apoteker (opsional)
+
+
+================================================================================
+
+TAHAPAN IMPLEMENTASI (ROADMAP)
+================================================================================
+
+FASE 1: BACKEND + DATABASE (2-3 minggu)
+────────────────────────────────────────
+□ Setup backend (Node.js/Express atau Python/FastAPI)
+□ Migrasi data dari localStorage ke PostgreSQL
+□ API endpoint: customers, medicines, branches, records
+□ Authentication (login staff/apoteker/admin)
+□ Migrasi frontend dari static data → API calls
+
+FASE 2: KNOWLEDGE BASE ISO/MIMS (2-3 minggu)
+────────────────────────────────────────
+□ Digitalisasi data ISO/MIMS yang relevan
+□ Buat database terstruktur:
+  - Tabel interaksi obat
+  - Tabel kontraindikasi
+  - Tabel kategori kehamilan
+  - Tabel dosis per usia
+□ Chunking dokumen ISO/MIMS untuk RAG
+□ Embedding dan simpan ke vector database
+□ Test retrieval accuracy
+
+FASE 3: INTEGRASI AI (2-3 minggu)
+────────────────────────────────────────
+□ Setup LLM service (GPT-4/Claude API)
+□ Implementasi RAG pipeline:
+  - Query → retrieve ISO/MIMS context → send to LLM → parse response
+□ Rule engine untuk pengecekan deterministik (alergi, kontraindikasi pasti)
+□ Combine: rule engine + LLM untuk response final
+□ Endpoint: POST /api/ai/safety-check
+□ Endpoint: POST /api/ai/recommend
+
+FASE 4: INTEGRASI FRONTEND (1-2 minggu)
+────────────────────────────────────────
+□ Hubungkan Safety Step ke backend AI (ganti rule-based lokal)
+□ Tambah fitur "Tanya AI" di Medicine Step
+□ Tampilkan referensi ISO/MIMS di hasil safety check
+□ Tampilkan rekomendasi alternatif dari AI
+□ Loading state & error handling
+
+FASE 5: TESTING & VALIDASI (1-2 minggu)
+────────────────────────────────────────
+□ Test dengan kasus-kasus real dari apoteker
+□ Validasi akurasi AI terhadap ISO/MIMS manual
+□ Edge case testing (multi-obat, multi-alergi, dll)
+□ Performance testing (response time < 3 detik)
+□ Review oleh apoteker profesional
+
+
+================================================================================
+
+KEUNGGULAN SETELAH AI TERINTEGRASI
+================================================================================
+
+SEBELUM (rule-based saat ini):
+- Hanya bisa cek 10 obat yang sudah di-hardcode
+- Aturan terbatas pada yang sudah ditulis manual
+- Tidak bisa merekomendasikan alternatif secara cerdas
+- Tidak ada referensi resmi (ISO/MIMS)
+
+SESUDAH (dengan AI + ISO/MIMS):
+- Bisa cek RATUSAN/RIBUAN obat
+- AI memahami konteks medis yang kompleks
+- Bisa merekomendasikan alternatif berdasarkan profil customer
+- Setiap keputusan memiliki REFERENSI ISO/MIMS yang bisa diverifikasi
+- AI bisa menjelaskan ALASAN dalam bahasa yang dipahami staff
+- Semakin banyak data → AI semakin akurat (learning dari pattern)
+- Staff bisa "bertanya" ke AI tentang kasus yang tidak pasti
+
+
+================================================================================
+
+CATATAN PENTING
+================================================================================
+
+1. PRIVASI DATA MEDIS
+   - Data customer adalah data sensitif (medical records)
+   - Jika pakai cloud LLM (GPT/Claude): pastikan compliance HIPAA/regulasi lokal
+   - Alternatif: gunakan model lokal (self-hosted) untuk menjaga privasi
+   - Enkripsi data at-rest dan in-transit
+
+2. AI BUKAN PENGGANTI APOTEKER
+   - AI adalah ASISTEN, bukan pengambil keputusan final
+   - Keputusan akhir tetap di tangan apoteker (terutama kasus warning/danger)
+   - AI membantu MEMPERCEPAT dan MENSTANDARKAN, bukan MENGGANTIKAN
+
+3. AKURASI KNOWLEDGE BASE
+   - ISO/MIMS harus selalu di-update (ada revisi berkala)
+   - Perlu mekanisme update knowledge base
+   - Perlu review berkala oleh tim farmasi
+
+4. FALLBACK
+   - Jika AI down/lambat, rule engine tetap berjalan (seperti saat ini)
+   - Tidak boleh bergantung 100% pada AI availability
+
+================================================================================
+
+FITUR TAMBAHAN: OBAT UTAMA / PRIMARY PRODUCT (★)
+================================================================================
+
+KONSEP:
+────────
+Bukalapak memiliki "Obat Utama" (Primary Product) — yaitu obat-obat yang
+menjadi PRIORITAS REKOMENDASI karena alasan bisnis:
+- Margin profit lebih tinggi
+- Produk eksklusif / kerjasama khusus
+- Produk private label Bukalapak
+- Produk promosi aktif
+
+Ketika AI merekomendasikan obat (baik sebagai pilihan utama maupun alternatif),
+obat yang berstatus "Primary Product" akan DIREKOMENDASIKAN TERLEBIH DAHULU
+selama secara medis AMAN dan SETARA kualitasnya.
+
+Obat utama ditandai dengan SIMBOL BINTANG (★) di seluruh tampilan UI.
+
+
+BAGAIMANA INI BEKERJA?
+──────────────────────
+
+LANGKAH 1: DATABASE OBAT MEMILIKI FLAG "PRIMARY"
+┌──────────────────────────────────────────────────────────────────────┐
+│ Tabel: medicines                                                     │
+│                                                                      │
+│ id       │ name              │ class       │ isPrimary │ priority   │
+│──────────┼───────────────────┼─────────────┼───────────┼────────────│
+│ MED001   │ Paracetamol 500mg │ Analgesik   │ false     │ 0          │
+│ MED002   │ Ibuprofen 400mg   │ NSAID       │ false     │ 0          │
+│ MED003   │ Amoxicillin 500mg │ Antibiotik  │ TRUE  ★   │ 10         │
+│ MED003B  │ Amoxicillin GenB  │ Antibiotik  │ false     │ 0          │
+│ MED004   │ Cefadroxil 500mg  │ Antibiotik  │ false     │ 0          │
+│ MED005   │ Vitamin C 500mg   │ Vitamin     │ TRUE  ★   │ 8          │
+│ MED005B  │ Vitamin C GenB    │ Vitamin     │ false     │ 0          │
+│ ...      │ ...               │ ...         │ ...       │ ...        │
+└──────────────────────────────────────────────────────────────────────┘
+
+Keterangan:
+- isPrimary = true  → Obat utama Bukalapak (ditandai ★)
+- priority = angka  → Semakin tinggi, semakin diprioritaskan dalam rekomendasi
+                      (misal: ada 2 obat primary, yang priority lebih tinggi
+                       tampil lebih dulu)
+
+
+LANGKAH 2: AI MEMPRIORITASKAN OBAT PRIMARY SAAT REKOMENDASI
+
+Contoh Skenario:
+Customer butuh antibiotik golongan Penisilin. Ada 3 opsi di database:
+
+  ┌─────────────────────────────────────────────────────────────────┐
+  │ OPSI ANTIBIOTIK YANG TERSEDIA:                                  │
+  │                                                                 │
+  │ 1. Amoxicillin 500mg (Bukalapak)  ← isPrimary: TRUE ★          │
+  │    Stok: 45 pcs │ Harga: Rp 12.000                             │
+  │                                                                 │
+  │ 2. Amoxicillin 500mg (Brand B)    ← isPrimary: false           │
+  │    Stok: 30 pcs │ Harga: Rp 15.000                             │
+  │                                                                 │
+  │ 3. Amoxicillin 500mg (Brand C)    ← isPrimary: false           │
+  │    Stok: 20 pcs │ Harga: Rp 11.000                             │
+  └─────────────────────────────────────────────────────────────────┘
+
+AI akan merekomendasikan URUTAN seperti ini:
+
+  ┌─────────────────────────────────────────────────────────────────┐
+  │ REKOMENDASI AI:                                                 │
+  │                                                                 │
+  │ ★ REKOMENDASI UTAMA:                                            │
+  │ ┌─────────────────────────────────────────────────────────────┐ │
+  │ │ ★ Amoxicillin 500mg (Bukalapak)                             │ │
+  │ │   Status: SAFE ✅                                            │ │
+  │ │   Stok: 45 pcs │ Harga: Rp 12.000                          │ │
+  │ │   Dosis: 3x sehari setelah makan                            │ │
+  │ │   Ref: ISO - Dosis dewasa Amoxicillin                       │ │
+  │ │                                           [PILIH OBAT INI]  │ │
+  │ └─────────────────────────────────────────────────────────────┘ │
+  │                                                                 │
+  │   Alternatif lain:                                              │
+  │   • Amoxicillin 500mg (Brand B) - Rp 15.000 - SAFE ✅          │
+  │   • Amoxicillin 500mg (Brand C) - Rp 11.000 - SAFE ✅          │
+  └─────────────────────────────────────────────────────────────────┘
+
+
+LANGKAH 3: LOGIKA PRIORITAS REKOMENDASI AI
+
+AI mengikuti urutan prioritas ini saat merekomendasikan:
+
+  ┌─────────────────────────────────────────────────────────────────┐
+  │                                                                 │
+  │  PRIORITAS 1: KEAMANAN (ISO/MIMS)                              │
+  │  → Obat HARUS aman untuk customer                              │
+  │  → Jika obat primary TIDAK AMAN → JANGAN rekomendasikan        │
+  │  → Keamanan pasien SELALU di atas profit                        │
+  │                                                                 │
+  │  PRIORITAS 2: KESESUAIAN MEDIS                                  │
+  │  → Obat harus sesuai indikasi/keluhan                          │
+  │  → Dosis harus tepat untuk usia/berat badan                    │
+  │                                                                 │
+  │  PRIORITAS 3: STATUS PRIMARY (★)                                │
+  │  → Jika ada 2+ obat yang sama-sama AMAN dan SESUAI,            │
+  │    maka obat PRIMARY ditampilkan PERTAMA                        │
+  │  → Obat primary mendapat highlight ★ dan badge khusus          │
+  │                                                                 │
+  │  PRIORITAS 4: KETERSEDIAAN STOK                                 │
+  │  → Obat yang stoknya tersedia lebih diprioritaskan              │
+  │                                                                 │
+  │  PRIORITAS 5: HARGA                                             │
+  │  → Jika semua faktor sama, urutkan dari harga terjangkau       │
+  │                                                                 │
+  └─────────────────────────────────────────────────────────────────┘
+
+  ATURAN KRITIS:
+  ──────────────
+  ⚠️  Obat primary yang TIDAK AMAN tetap TIDAK direkomendasikan.
+      Keamanan pasien > profit. SELALU.
+
+  ⚠️  Jika obat primary stoknya HABIS, AI merekomendasikan alternatif
+      non-primary tetapi tetap MENAMPILKAN obat primary dengan catatan
+      "Stok habis di cabang ini".
+
+  ⚠️  AI TIDAK BOLEH memaksa obat primary jika ada alternatif yang
+      secara medis LEBIH TEPAT untuk kondisi customer.
+
+
+TAMPILAN UI: SIMBOL BINTANG (★)
+───────────────────────────────
+
+Obat primary ditandai dengan bintang di SEMUA tempat obat ditampilkan:
+
+1. KARTU OBAT (Medicine Step):
+   ┌─────────────────────────────────────┐
+   │ ★ Amoxicillin 500mg                │  ← Bintang di nama
+   │ Antibiotik · Kapsul · 500mg         │
+   │ ┌──────────┐ ┌──────────┐          │
+   │ │ Stok: 45 │ │ Rp12.000 │          │
+   │ └──────────┘ └──────────┘          │
+   │ ┌─────────────────────────────────┐│
+   │ │ ★ Obat Utama Bukalapak         ││  ← Badge khusus
+   │ └─────────────────────────────────┘│
+   │ [        Tambah Obat        ]      │
+   └─────────────────────────────────────┘
+
+2. HASIL SAFETY CHECK:
+   ┌─────────────────────────────────────┐
+   │ ★ Amoxicillin 500mg                │
+   │ Status: SAFE ✅                     │
+   │ ★ Rekomendasi utama Bukalapak      │  ← Label primary
+   └─────────────────────────────────────┘
+
+3. REKOMENDASI AI:
+   ┌─────────────────────────────────────┐
+   │ ★ REKOMENDASI UTAMA                │  ← Section terpisah
+   │   Amoxicillin 500mg (Bukalapak)    │
+   │                                     │
+   │   Alternatif:                       │
+   │   • Amoxicillin 500mg (Brand B)    │  ← Tanpa bintang
+   │   • Amoxicillin 500mg (Brand C)    │
+   └─────────────────────────────────────┘
+
+4. TRAY OBAT TERPILIH:
+   ┌─────────────────────────────────────┐
+   │ ★ Amoxicillin 500mg │ 45 pcs │ ✕   │  ← Bintang di tray
+   └─────────────────────────────────────┘
+
+5. RECORD PELAYANAN:
+   ┌─────────────────────────────────────┐
+   │ Obat: ★ Amoxicillin 500mg          │  ← Tercatat di history
+   │ Tipe: Obat Utama Bukalapak         │
+   └─────────────────────────────────────┘
+
+
+CONTOH SKENARIO LENGKAP DENGAN PRIMARY PRODUCT
+───────────────────────────────────────────────
+
+Skenario: Customer batuk berdahak, staff minta rekomendasi AI
+
+  Staff: "Customer batuk berdahak 3 hari, obat apa yang cocok?"
+       │
+       ▼
+  ┌─────────────────────────────────────────────────────────────────┐
+  │ AI MENGANALISIS:                                                │
+  │ - Keluhan: batuk berdahak                                      │
+  │ - Kategori obat yang relevan: Ekspektoran, Mukolitik, Antitusif│
+  │ - Obat tersedia di cabang ini:                                  │
+  │   * OBH Combi Sirup (isPrimary: TRUE ★, priority: 10)          │
+  │   * Ambroxol Tab (isPrimary: false)                             │
+  │   * Guaifenesin Sirup (isPrimary: false)                        │
+  │ - Profil customer: Dewasa, tidak hamil, tidak alergi            │
+  │ - ISO/MIMS: Semua 3 obat AMAN untuk profil ini                 │
+  └─────────────────────────────────────────────────────────────────┘
+       │
+       ▼
+  ┌─────────────────────────────────────────────────────────────────┐
+  │ REKOMENDASI AI:                                                 │
+  │                                                                 │
+  │ ★ REKOMENDASI UTAMA:                                            │
+  │ ┌───────────────────────────────────────────────────────────┐   │
+  │ │ ★ OBH Combi Sirup 100ml                                  │   │
+  │ │   Status: SAFE ✅                                          │   │
+  │ │   Indikasi: Batuk berdahak, meredakan tenggorokan         │   │
+  │ │   Stok: 30 botol │ Harga: Rp 25.000                      │   │
+  │ │   Dosis: 3x sehari 1 sendok makan (15ml) sesudah makan   │   │
+  │ │   ★ Obat Utama Bukalapak                                  │   │
+  │ │   [Ref: ISO - OBH Combi, indikasi & dosis]                │   │
+  │ └───────────────────────────────────────────────────────────┘   │
+  │                                                                 │
+  │   Alternatif:                                                   │
+  │   • Ambroxol 30mg Tab - Rp 8.000 - Mukolitik - SAFE ✅         │
+  │   • Guaifenesin Sirup - Rp 18.000 - Ekspektoran - SAFE ✅      │
+  │                                                                 │
+  │   Catatan AI:                                                   │
+  │   Jika batuk >7 hari atau disertai demam tinggi, sarankan      │
+  │   konsultasi dokter.                                            │
+  └─────────────────────────────────────────────────────────────────┘
+
+CONTOH KETIKA OBAT PRIMARY TIDAK AMAN:
+
+  Skenario: Customer alergi Penisilin butuh antibiotik
+
+  ┌─────────────────────────────────────────────────────────────────┐
+  │ AI MENGANALISIS:                                                │
+  │ - Butuh: Antibiotik                                             │
+  │ - Obat primary: ★ Amoxicillin 500mg (golongan Penisilin)       │
+  │ - Customer: ALERGI PENISILIN                                    │
+  │ - ISO/MIMS: Amoxicillin KONTRAINDIKASI ABSOLUT                 │
+  └─────────────────────────────────────────────────────────────────┘
+       │
+       ▼
+  ┌─────────────────────────────────────────────────────────────────┐
+  │ REKOMENDASI AI:                                                 │
+  │                                                                 │
+  │ ⛔ ★ Amoxicillin 500mg — TIDAK DAPAT DIREKOMENDASIKAN          │
+  │    Alasan: Customer alergi Penisilin. Amoxicillin golongan     │
+  │    Penisilin → risiko anafilaksis.                              │
+  │    [Ref: ISO - Kontraindikasi Absolut]                          │
+  │                                                                 │
+  │ ✅ ALTERNATIF YANG AMAN:                                        │
+  │ ┌───────────────────────────────────────────────────────────┐   │
+  │ │ Azithromycin 500mg                                        │   │
+  │ │ Status: SAFE ✅ │ Golongan: Makrolida (bukan Penisilin)   │   │
+  │ │ Stok: 20 pcs │ Harga: Rp 22.000                          │   │
+  │ │ Tidak ada cross-reactivity dengan alergi Penisilin        │   │
+  │ │ [Ref: MIMS - Macrolide safety in Penicillin allergy]      │   │
+  │ └───────────────────────────────────────────────────────────┘   │
+  │                                                                 │
+  │ ⚠️ PENTING: Obat utama (★ Amoxicillin) tidak dapat diberikan   │
+  │    karena alasan keamanan. Keselamatan pasien adalah prioritas. │
+  └─────────────────────────────────────────────────────────────────┘
+
+  → AI tetap TRANSPARAN bahwa obat primary ada tapi tidak aman.
+  → Staff paham kenapa obat primary tidak direkomendasikan.
+
+
+MANFAAT BISNIS FITUR PRIMARY PRODUCT
+─────────────────────────────────────
+
+1. MENINGKATKAN PENJUALAN OBAT UTAMA
+   → Obat primary selalu muncul pertama jika aman
+   → Staff otomatis menawarkan obat primary ke customer
+
+2. TIDAK MENGORBANKAN KEAMANAN
+   → AI TIDAK PERNAH merekomendasikan obat primary jika tidak aman
+   → Trust customer dan reputasi apotek tetap terjaga
+
+3. TRACKING & ANALYTICS
+   → Bisa dilacak: berapa % pelayanan yang menggunakan obat primary
+   → Bisa ukur efektivitas strategi primary product
+   → Data untuk negosiasi dengan supplier
+
+4. FLEKSIBEL
+   → Admin bisa mengubah flag primary kapan saja
+   → Priority bisa diatur per periode (misal: promosi bulanan)
+   → Bisa berbeda per cabang jika diperlukan
+
+5. TRANSPARANSI
+   → Simbol ★ membuat staff SADAR bahwa ini obat prioritas
+   → Customer TIDAK melihat simbol ini (hanya internal staff)
+   → Audit trail: tercatat di record apakah obat primary yang diberikan
+
+
+================================================================================
+Dokumen ini menjelaskan rencana integrasi AI ke prototype RakObat/PharmaLocate,
+termasuk fitur Primary Product (★) untuk optimalisasi rekomendasi obat utama.
+================================================================================

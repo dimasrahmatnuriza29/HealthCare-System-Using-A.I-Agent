@@ -1,1 +1,1 @@
-export { buildStaffSafetyPrompt } from '../services/safetyService.js';
+export { buildSafetyCheckPrompt, buildRecommendationPrompt } from '../services/aiPromptBuilder.js';
